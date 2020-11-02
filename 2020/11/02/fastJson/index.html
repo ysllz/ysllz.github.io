@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>fastJson - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="JUnit4在学习fastjson之前，感觉有必要先学习一下Junit4的注解，自从SpringBoot之后注解大量的被使用，
+JUnit出现的与因为main方法测试很不方便，摘自百度的部分：
+12,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">fastJson</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">fastJson</h1>
+        <div class="stuff">
+            <span>十一月 02, 2020</span>
+            
+
+        </div>
+        <div class="content markdown">
+            <h1 id="JUnit4"><a href="#JUnit4" class="headerlink" title="JUnit4"></a>JUnit4</h1><p>在学习fastjson之前，感觉有必要先学习一下Junit4的注解，自从SpringBoot之后注解大量的被使用，</p>
+<p>JUnit出现的与因为main方法测试很不方便，摘自百度的部分：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">用main方法测试的话就很不方便，想测试全部方法的话就得把测试代码全部写到里，或者你测一个重写一次。且更重要的是，这样会使测试代码与运行逻辑代码混在一起，不规范。</span><br><span class="line">使用junit就方便多了,这是单元测试，你想测哪个方法就写一个对应的测试方法，然后用junit运行。每个方法之间是独立的，非常灵活。而且测试方法一般不会直接写在原类中，而是单独的测试类，这样测试代码就完全与逻辑代码分开了。	</span><br></pre></td></tr></table></figure>
+
+<p>而在Junit4大量使用了从Java5中开始使用的注解，如下是JUnit4常用的注解：</p>
+<h2 id="before，test，after"><a href="#before，test，after" class="headerlink" title="before，test，after"></a>before，test，after</h2><ul>
+<li><p>Before：初始化方法，针对每个测试方法，都会执行一遍</p>
+</li>
+<li><p>Test: 代替main函数，可以让我们灵活的测试某部分代码,注意，测试的时候<strong>不要写一个Test类！！！！</strong>，否则因为会有限选择同包下的test类，导致报错,@Test方法所在类中,<strong>不能存在有参数构造函数,无参构造可以存在</strong></p>
+</li>
+<li><p>After：在方法结束之后执行，每次都会执行！</p>
+</li>
+</ul>
+<p>例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.ys.pojo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.After;</span><br><span class="line"><span class="keyword">import</span> org.junit.Before;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123;</span><br><span class="line">    <span class="meta">@Before</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">before</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;最先被执行！&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;wdnmd&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@After</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">after</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;我之后才会被执行呢&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除此之外，Test注解还允许我们添加参数，检测是否抛出某部分异常：</p>
+<p>例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Test(expected = Exception.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] array = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">3</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">            array[i] = i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当代码出现异常的时候，则不会抛出异常，相反的，如果这段代码正常抛出，就会抛出异常了。</p>
+<h2 id="beforeclass，afterclass"><a href="#beforeclass，afterclass" class="headerlink" title="beforeclass，afterclass"></a>beforeclass，afterclass</h2><ul>
+<li>BeforeClass: 在所有类被执行之前执行，只会执行一次，同时必须为static静态方法（因为他们就相当于此）</li>
+<li>AfterClass: 在所有类被执行之后执行</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.ys.pojo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Array;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123;</span><br><span class="line">    <span class="meta">@Before</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">before</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;我就相当于构造器！&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;我是test1，我被执行了&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@After</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">after</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;我之后才会被执行&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test(expected = Exception.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] array = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">3</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">            array[i] = i;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;我是test2执行了！&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@BeforeClass</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">beforeClass</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;我在所有的前面被执行，并且我只会执行一次！&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@AfterClass</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">afterClass</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;我在最终所有结束之后才会被执行&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Ignore"><a href="#Ignore" class="headerlink" title="Ignore"></a>Ignore</h2><ul>
+<li>Ignore可以让我们暂时的禁用特定的类，被注解之后的类将不再被执行</li>
+</ul>
+<p>Ignore经过我测试，只有当他放在测试类前才可以生效。</p>
+<p>例子：</p>
+<p><img src="image-20201102165311512.png" alt="image-20201102165311512"></p>
+<p>而如果我们放在其他类前面：</p>
+<p><img src="image-20201102165351821.png" alt="image-20201102165351821"></p>
+<p>我们可以发现依然被执行了！</p>
+<h2 id="Runwith"><a href="#Runwith" class="headerlink" title="Runwith"></a>Runwith</h2><ul>
+<li>Runwith放在测试类之前，用于确定这个类该如何运行，我们也可以不标注，将会使用默认的运行容器</li>
+</ul>
+<p>可以看这篇文章来理解：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;my.oschina.net&#x2F;itblog&#x2F;blog&#x2F;1550753?tdsourcetag&#x3D;s_pcqq_aiomsg</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="Fastjson"><a href="#Fastjson" class="headerlink" title="Fastjson"></a>Fastjson</h1><ul>
+<li><p>Fastjson 是一个 Java 库，可以将 Java 对象转换为 JSON 格式，当然它也可以将 JSON 字符串转换为 Java 对象。</p>
+</li>
+<li><p>Fastjson 可以操作任何 Java 对象，即使是一些预先存在的没有源码的对象。</p>
+</li>
+<li><p>Fastjson 源码地址：<a target="_blank" rel="noopener" href="https://github.com/alibaba/fastjson">https://github.com/alibaba/fastjson</a></p>
+</li>
+<li><p>Fastjson 中文 Wiki：<a target="_blank" rel="noopener" href="https://github.com/alibaba/fastjson/wiki/Quick-Start-CN">https://github.com/alibaba/fastjson/wiki/Quick-Start-CN</a></p>
+</li>
+<li><p>也就是说，程序员们用这个程序就是为了传运JSON格式的对象，呃，感觉像序列化一样了？</p>
+</li>
+</ul>
+<h2 id="将JAVA对象转换成json格式"><a href="#将JAVA对象转换成json格式" class="headerlink" title="将JAVA对象转换成json格式"></a>将JAVA对象转换成json格式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.ys.pojo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> org.junit.Before;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Fortest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;JavaToJson&gt; listOfJava = <span class="keyword">new</span> ArrayList&lt;JavaToJson&gt;();</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Before</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUp</span><span class="params">()</span></span>&#123;</span><br><span class="line">        listOfJava.add(<span class="keyword">new</span> JavaToJson(<span class="number">18</span>,<span class="string">&quot;wndmd&quot;</span>,<span class="keyword">new</span> Date()));</span><br><span class="line">        listOfJava.add(<span class="keyword">new</span> JavaToJson(<span class="number">20</span>,<span class="string">&quot;Json!&quot;</span>,<span class="keyword">new</span> Date()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String list = JSON.toJSONString(listOfJava);</span><br><span class="line">        System.out.println(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>注意，上述代码需要另外起一个类，test不允许在有参构造的类中出现</p>
+<p>得到输出结果：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;<span class="attr">&quot;Age&quot;</span>:<span class="number">18</span>,</span><br><span class="line">     <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="number">1604309562809</span>,</span><br><span class="line">     <span class="attr">&quot;FULL NAME&quot;</span>:<span class="string">&quot;wndmd&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">&quot;Age&quot;</span>:<span class="number">20</span>,</span><br><span class="line">        <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="number">1604309562809</span>,</span><br><span class="line">        <span class="attr">&quot;FULL NAME&quot;</span>:<span class="string">&quot;Json!&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>我们还可以格式化自定义输出，控制字段的排序。</p>
+<p>我们更新bean并添加如下字段：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JavaToJson</span> </span>&#123;</span><br><span class="line">    <span class="meta">@JSONField(name = &quot;Age&quot;,serialize = false)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JSONField(name = &quot;FULL NAME&quot;,ordinal = 2)</span></span><br><span class="line">    <span class="keyword">private</span> String fullName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JSONField(name = &quot;DATE OF BIRTH&quot;,format = &quot;dd/MM/yyyy&quot;,ordinal = 1)</span></span><br><span class="line">    <span class="keyword">private</span> Date date;</span><br></pre></td></tr></table></figure>
+
+<p>注意在这里我们添加serialize = false，这里是默认我们添加序列化，如果我们设置为false，该字段将不会被显示。</p>
+<p>而ordinal，则是用于规定格式化的顺序，需要注意的是，如果你想控制，最好就全部都使用该属性修饰，或者你自己干脆写的时候就从上向下写，不然的话，默认从上向下执行，只会再按照ordinal限定的顺序排列</p>
+<p>上述代码输出：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="string">&quot;02/11/2020&quot;</span>,</span><br><span class="line">     	<span class="attr">&quot;FULL NAME&quot;</span>:<span class="string">&quot;wndmd&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line"> 	&#123;</span><br><span class="line">        <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="string">&quot;02/11/2020&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;FULL NAME&quot;</span>:<span class="string">&quot;Json!&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>如果将serialize的false去掉之后，他还是第一个被执行：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">&quot;Age&quot;</span>:<span class="number">18</span>,</span><br><span class="line">        <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="string">&quot;02/11/2020&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;FULL NAME&quot;</span>:<span class="string">&quot;wndmd&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">&quot;Age&quot;</span>:<span class="number">20</span>,</span><br><span class="line">        <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="string">&quot;02/11/2020&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;FULL NAME&quot;</span>:<span class="string">&quot;Json!&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h2 id="作用对象"><a href="#作用对象" class="headerlink" title="作用对象"></a>作用对象</h2><p>@JSONField 的作用对象:</p>
+<ul>
+<li><ol>
+<li>Field</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>Setter 和 Getter 方法</li>
+</ol>
+</li>
+</ul>
+<p>需要注意如下两点：</p>
+<p><strong>注意：</strong>FastJson 在进行操作时，是根据 getter 和 setter 的方法进行的，并不是依据 Field 进行。</p>
+<p><strong>注意：</strong>若属性是私有的，必须有 set 方法。否则无法反序列化。</p>
+<p>跟进JSONField查看源码，可以知道我们允许指定很多东西=。=：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> JSONField &#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">ordinal</span><span class="params">()</span> <span class="keyword">default</span> 0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">name</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">format</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">serialize</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">true</span></span>;</span><br><span class="line">	<span class="comment">//注意这里，反序列化！</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">deserialize</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">true</span></span>;</span><br><span class="line"></span><br><span class="line">    SerializerFeature[] serialzeFeatures() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    Feature[] parseFeatures() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">label</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">jsonDirect</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">    Class&lt;?&gt; serializeUsing() <span class="keyword">default</span> Void.class;</span><br><span class="line"></span><br><span class="line">    Class&lt;?&gt; deserializeUsing() <span class="keyword">default</span> Void.class;</span><br><span class="line"></span><br><span class="line">    String[] alternateNames() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">unwrapped</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">defaultValue</span><span class="params">()</span> <span class="keyword">default</span> &quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置方式"><a href="#配置方式" class="headerlink" title="配置方式"></a>配置方式</h2><p>FieldInfo 可以配置在 getter/setter 方法或者字段上。例如：</p>
+<h3 id="配置在-getter-setter-上"><a href="#配置在-getter-setter-上" class="headerlink" title="配置在 getter/setter 上"></a>配置在 getter/setter 上</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"> </span><br><span class="line">      <span class="meta">@JSONField(name=&quot;ID&quot;)</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> id;&#125;</span><br><span class="line">      <span class="meta">@JSONField(name=&quot;ID&quot;)</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;<span class="keyword">this</span>.id = id;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配置在-field-上"><a href="#配置在-field-上" class="headerlink" title="配置在 field 上"></a>配置在 field 上</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">     <span class="meta">@JSONField(name=&quot;ID&quot;)</span></span><br><span class="line">     <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> id;&#125;</span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;<span class="keyword">this</span>.id = id;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="创建-JSON-对象"><a href="#创建-JSON-对象" class="headerlink" title="创建 JSON 对象"></a>创建 JSON 对象</h2><p>创建 JSON 对象非常简单，只需使用 JSONObject（fastJson提供的json对象） 和 JSONArray（fastJson提供json数组对象） 对象即可。</p>
+<p>虽然JSONArryay也可以创建一个JSON对象，但我觉得书写方式不够美观，其中如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">whenGenerateJson_thanGenerationCorrect</span><span class="params">()</span> <span class="keyword">throws</span> ParseException </span>&#123;</span><br><span class="line">    JSONArray jsonArray = <span class="keyword">new</span> JSONArray();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123;</span><br><span class="line">        JSONObject jsonObject = <span class="keyword">new</span> JSONObject();</span><br><span class="line">        jsonObject.put(<span class="string">&quot;AGE&quot;</span>, <span class="number">10</span>);</span><br><span class="line">        jsonObject.put(<span class="string">&quot;FULL NAME&quot;</span>, <span class="string">&quot;Doe &quot;</span> + i);</span><br><span class="line">        jsonObject.put(<span class="string">&quot;DATE OF BIRTH&quot;</span>, <span class="string">&quot;2016/12/12 12:12:12&quot;</span>);</span><br><span class="line">        jsonArray.add(jsonObject);</span><br><span class="line">    &#125;</span><br><span class="line">    String jsonOutput = jsonArray.toJSONString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="JSON-字符串转换为-Java-对象"><a href="#JSON-字符串转换为-Java-对象" class="headerlink" title="JSON 字符串转换为 Java 对象"></a>JSON 字符串转换为 Java 对象</h2><p>fastjson允许我们可以将前端传来的数据转换变成JSON数据，同样的也允许我们把后端数据转换为JSON字符串丢给前端。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">jsonToJava</span><span class="params">()</span></span>&#123;</span><br><span class="line">        JavaToJson miaomiaomiao = <span class="keyword">new</span> JavaToJson(<span class="number">21</span>, <span class="string">&quot;miaomiaomiao&quot;</span>, <span class="keyword">new</span> Date());</span><br><span class="line">        String jsonObject = JSON.toJSONString(miaomiaomiao);</span><br><span class="line"><span class="comment">//        System.out.println(jsonObject);</span></span><br><span class="line"><span class="comment">//        这前面的part我们将数据转换成了JSON数据</span></span><br><span class="line">        JavaToJson newJavaObject = JSON.parseObject(jsonObject,JavaToJson.class);</span><br><span class="line"><span class="comment">//        指定需要转换的JSON字符串，并且指定原型,这样的话一个JAVA对象就指定好了</span></span><br><span class="line">        System.out.println(newJavaObject.getAge());</span><br><span class="line">        System.out.println(newJavaObject.getFullName());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用ContextValuFilter配置JSON转换"><a href="#使用ContextValuFilter配置JSON转换" class="headerlink" title="使用ContextValuFilter配置JSON转换"></a>使用ContextValuFilter配置JSON转换</h3><p>在有些场景中，对Value做过滤，需要获得所述JavaBean的信息，而我们可能想要过滤某些信息，便可以使用该方法进行操作了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Before</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">before</span><span class="params">()</span></span>&#123;</span><br><span class="line">      listOfJava.add(<span class="keyword">new</span> JavaToJson(<span class="number">31</span>,<span class="string">&quot;wdnmd&quot;</span>,<span class="keyword">new</span> Date()));</span><br><span class="line">      listOfJava.add(<span class="keyword">new</span> JavaToJson(<span class="number">33</span>,<span class="string">&quot;wd&quot;</span>,<span class="keyword">new</span> Date()));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">givenContextFilter_whenJavaObject_thanJsonCorrect</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      ContextValueFilter valueFilter = <span class="keyword">new</span> ContextValueFilter () &#123;</span><br><span class="line">          <span class="function"><span class="keyword">public</span> Object <span class="title">process</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">                  BeanContext context, Object object, String name, Object value)</span> </span>&#123;</span><br><span class="line">              <span class="keyword">if</span> (name.equals(<span class="string">&quot;DATE OF BIRTH&quot;</span>)) &#123;</span><br><span class="line">                  <span class="keyword">return</span> <span class="string">&quot;NOT TO DISCLOSE&quot;</span>;</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="keyword">if</span> (value.equals(<span class="string">&quot;wdnmd&quot;</span>)) &#123;</span><br><span class="line">                  <span class="keyword">return</span> ((String) value).toUpperCase();</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;;</span><br><span class="line">      String jsonOutput = JSON.toJSONString(listOfJava, valueFilter);</span><br><span class="line">      System.out.println(jsonOutput);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>经过上述代码的操作，我们的时间将会修改为NOT TO DISCLOSE，并且数据中不包含wdnmd的将会被过滤,具体输出如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="string">&quot;NOT TO DISCLOSE&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">     &#123;</span><br><span class="line">         <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="string">&quot;NOT TO DISCLOSE&quot;</span></span><br><span class="line">     &#125;,</span><br><span class="line">     &#123;</span><br><span class="line">         <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="string">&quot;NOT TO DISCLOSE&quot;</span>,<span class="attr">&quot;FULL NAME&quot;</span>:<span class="string">&quot;wdnmd&quot;</span></span><br><span class="line">     &#125;,</span><br><span class="line">     &#123;</span><br><span class="line">         <span class="attr">&quot;DATE OF BIRTH&quot;</span>:<span class="string">&quot;NOT TO DISCLOSE&quot;</span></span><br><span class="line">     &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JUnit4"><span class="toc-number">1.</span> <span class="toc-text">JUnit4</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#before%EF%BC%8Ctest%EF%BC%8Cafter"><span class="toc-number">1.1.</span> <span class="toc-text">before，test，after</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#beforeclass%EF%BC%8Cafterclass"><span class="toc-number">1.2.</span> <span class="toc-text">beforeclass，afterclass</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ignore"><span class="toc-number">1.3.</span> <span class="toc-text">Ignore</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Runwith"><span class="toc-number">1.4.</span> <span class="toc-text">Runwith</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Fastjson"><span class="toc-number">2.</span> <span class="toc-text">Fastjson</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%86JAVA%E5%AF%B9%E8%B1%A1%E8%BD%AC%E6%8D%A2%E6%88%90json%E6%A0%BC%E5%BC%8F"><span class="toc-number">2.1.</span> <span class="toc-text">将JAVA对象转换成json格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.2.</span> <span class="toc-text">作用对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F"><span class="toc-number">2.3.</span> <span class="toc-text">配置方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%9C%A8-getter-setter-%E4%B8%8A"><span class="toc-number">2.3.1.</span> <span class="toc-text">配置在 getter&#x2F;setter 上</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%9C%A8-field-%E4%B8%8A"><span class="toc-number">2.3.2.</span> <span class="toc-text">配置在 field 上</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA-JSON-%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.4.</span> <span class="toc-text">创建 JSON 对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JSON-%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%8D%A2%E4%B8%BA-Java-%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.5.</span> <span class="toc-text">JSON 字符串转换为 Java 对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8ContextValuFilter%E9%85%8D%E7%BD%AEJSON%E8%BD%AC%E6%8D%A2"><span class="toc-number">2.5.1.</span> <span class="toc-text">使用ContextValuFilter配置JSON转换</span></a></li></ol></li></ol></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>

