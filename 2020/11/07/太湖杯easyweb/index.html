@@ -5,12 +5,14 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Archive: 2020/10</title>
+    <title>太湖杯easyweb - 月出从云</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="google" content="notranslate" />
     <meta name="keywords" content="Fechin,"> 
-    
+    <meta name="description" content="感觉太湖杯的题目都挺难的..这次自己制作出来一道题，是一道SSTI，做的时候一开始还以为是nodejs进行命令执行什么的
+难点这道题的难点主要是过滤掉了花括号，和双引号等。
+做题思路这道题初看就感觉,"> 
     
     <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
     <link rel="icon" href="/img/1.ico"> 
@@ -35,93 +37,100 @@
 <body class="loading">
     <span id="config-title" style="display:none">月出从云</span>
     <div id="loader"></div>
-    <div id="single" class="page">
-    <div id="top">
-        <a class="iconfont icon-left image-icon" href="javascript:history.back()"></a>
-    </div>
-    <div class="section">
-        <div class="article">
-            <div class="main">
-                <div class="content">
-                    <div class="timeline">
-                      <h2 class="timeline-title">归档: 11篇</h2><hr>
-                      
-                      
-                        
-                          <h3 class="timeline-subtitle">2020</h3>
-                        
-                        <div class="timeline-item">
-                          <time>2020-11-07</time>
-                          <a target="_self" href="/2020/11/07/%E5%A4%AA%E6%B9%96%E6%9D%AFeasyweb/">太湖杯easyweb</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-11-02</time>
-                          <a target="_self" href="/2020/11/02/JavaSerialize/">JavaSerialize</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-11-02</time>
-                          <a target="_self" href="/2020/11/02/fastJson/">fastJson</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-10-30</time>
-                          <a target="_self" href="/2020/10/30/NPUCTF2020/">NPUCTF2020</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-10-29</time>
-                          <a target="_self" href="/2020/10/29/MRCTF2020/">MRCTF2020</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-10-29</time>
-                          <a target="_self" href="/2020/10/29/%E5%8D%8E%E5%8C%97%E8%B5%9B%E5%8C%BADropbox/">华北赛区Dropbox</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-10-28</time>
-                          <a target="_self" href="/2020/10/28/2020%E7%BD%91%E9%BC%8E%E6%9D%AFphpweb/">2020网鼎杯phpweb</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-10-27</time>
-                          <a target="_self" href="/2020/10/27/GKCTF/">GKCTF</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-10-27</time>
-                          <a target="_self" href="/2020/10/27/%E5%85%A8%E5%9B%BD%E5%B7%A5%E6%8E%A72020-web-easyphp/">全国工控2020-web-easyphp</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-10-27</time>
-                          <a target="_self" href="/2020/10/27/FlaskSSti/">FlaskSSti</a>
-                        </div>
-                      
-                        
-                        <div class="timeline-item">
-                          <time>2020-10-25</time>
-                          <a target="_self" href="/2020/10/25/Vue%E6%80%BB%E7%BB%93/">Vue总结</a>
-                        </div>
-                      
-                    </div>
-                </div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">太湖杯easyweb</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
             </div>
+            <div id="qr"></div>
         </div>
     </div>
+    <div class="scrollbar"></div>
 </div>
 
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">太湖杯easyweb</h1>
+        <div class="stuff">
+            <span>十一月 07, 2020</span>
+            
+
+        </div>
+        <div class="content markdown">
+            <p>感觉太湖杯的题目都挺难的..这次自己制作出来一道题，是一道SSTI，做的时候一开始还以为是nodejs进行命令执行什么的</p>
+<h1 id="难点"><a href="#难点" class="headerlink" title="难点"></a>难点</h1><p>这道题的难点主要是过滤掉了花括号，和双引号等。</p>
+<h1 id="做题思路"><a href="#做题思路" class="headerlink" title="做题思路"></a>做题思路</h1><p>这道题初看就感觉是一道SSTI，但是刚开始的时候被花括号卡住了，搞得我以为是是其他题目，结果相当想到A1CTF独角兽那道题目，才有了思路，首先，我们可以确定的是，我们输入一些花里胡哨的东西会被转换为标准的字符串输出，如图：</p>
+<p><img src="image-20201107195218392.png" alt="image-20201107195218392"></p>
+<p>于是我联想到可以通过输入类似的花括号的utf8编码下的字符串进行绕过：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://www.compart.com/en/unicode/U+FE5C</span><br></pre></td></tr></table></figure>
+
+<p>其中这一行</p>
+<table>
+<thead>
+<tr>
+<th>UTF-8 Encoding:</th>
+<th><code>0xEF 0xB9 0x9C</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>我们将0x修改为百分号即可</p>
+<p><img src="image-20201107195633976.png" alt="image-20201107195633976"></p>
+<p>之后就是正常的SSTI了，我们将不需要引号的payload往上上一甩就行了</p>
+<p><img src="image-20201107195717338.png" alt="image-20201107195717338"></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9A%BE%E7%82%B9"><span class="toc-number">1.</span> <span class="toc-text">难点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%81%9A%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">做题思路</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
 </body>
 
 <script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>

