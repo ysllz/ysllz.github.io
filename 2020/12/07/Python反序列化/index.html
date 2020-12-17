@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Python反序列化 - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="今天在刷BUU的时候做到了IKUN这道题目，以前没有接触过Python的反序列化，所以不会做到最后一步..复现完之后决定总结一下Python的反序列化的几种方式：
+Python能够实现的序列化与反序,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">Python反序列化</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">Python反序列化</h1>
+        <div class="stuff">
+            <span>十二月 07, 2020</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/Python/" rel="tag">Python</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>今天在刷BUU的时候做到了IKUN这道题目，以前没有接触过Python的反序列化，所以不会做到最后一步..复现完之后决定总结一下Python的反序列化的几种方式：</p>
+<p>Python能够实现的序列化与反序列化方式主要有三：</p>
+<ul>
+<li>JSON</li>
+<li>pickle</li>
+<li>shelve</li>
+</ul>
+<p>而这Ikun这道题使用的便是Pickle，故我们从这一部分开始说起。</p>
+<h1 id="Pickle"><a href="#Pickle" class="headerlink" title="Pickle"></a>Pickle</h1><p>pickle提供了一个简单的持久化功能。可以将对象以文件的形式存放在磁盘上。</p>
+<p>pickle模块只能在python中使用，python中几乎所有的数据类型（列表，字典，集合，类等）都可以用pickle来序列化，</p>
+<p>pickle序列化后的数据，可读性差，人一般无法识别。</p>
+<p>Python接口有4个：</p>
+<ul>
+<li>dump</li>
+<li>dumps</li>
+<li>load</li>
+<li>loads</li>
+</ul>
+<h2 id="dump"><a href="#dump" class="headerlink" title="dump"></a>dump</h2><p>dump我们用于将数据写入文件当中，官方文档中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pickle.dump（obj，file，protocol = <span class="literal">None</span>，*，fix_imports = <span class="literal">True</span> ）</span><br></pre></td></tr></table></figure>
+
+<p>我们可以实践一下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, n, a</span>):</span></span><br><span class="line">        self.name = n</span><br><span class="line">        self.age = a</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">show</span>(<span class="params">self</span>):</span></span><br><span class="line">        print(self.name + <span class="string">&quot;_&quot;</span> + <span class="built_in">str</span>(self.age))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">aa = Person(<span class="string">&quot;JGood&quot;</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">f=<span class="built_in">open</span>(<span class="string">&#x27;p.txt&#x27;</span>,<span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">pickle.dump(aa,f,<span class="number">0</span>)</span><br><span class="line">f.close()</span><br><span class="line"></span><br><span class="line">得到数据如下：</span><br><span class="line">ccopy_reg</span><br><span class="line">_reconstructor</span><br><span class="line">p0</span><br><span class="line">(c__main__</span><br><span class="line">Person</span><br><span class="line">p1</span><br><span class="line">c__builtin__</span><br><span class="line"><span class="built_in">object</span></span><br><span class="line">p2</span><br><span class="line">Ntp3</span><br><span class="line">Rp4</span><br><span class="line">(dp5</span><br><span class="line">Vname</span><br><span class="line">p6</span><br><span class="line">VJGood</span><br><span class="line">p7</span><br><span class="line">sVage</span><br><span class="line">p8</span><br><span class="line">I2</span><br><span class="line">sb.</span><br><span class="line"><span class="comment"># 这里需要注意，会有大量的\n换行符</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="dumps"><a href="#dumps" class="headerlink" title="dumps"></a>dumps</h2><p>该函数与dump的差别在于该函数不会将对象写入文件当中，只会将其转化为bytes对象，例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, n, a</span>):</span></span><br><span class="line">        self.name = n</span><br><span class="line">        self.age = a</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">show</span>(<span class="params">self</span>):</span></span><br><span class="line">        print(self.name + <span class="string">&quot;_&quot;</span> + <span class="built_in">str</span>(self.age))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">aa = Person(<span class="string">&quot;JGood&quot;</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># f=open(&#x27;p.txt&#x27;,&#x27;wb&#x27;)</span></span><br><span class="line">c = pickle.dumps(aa,<span class="number">0</span>)</span><br><span class="line">print(c)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b&#x27;ccopy_reg\n_reconstructor\np0\n(c__main__\nPerson\np1\nc__builtin__\nobject\np2\nNtp3\nRp4\n(dp5\nVname\np6\nVJGood\np7\nsVage\np8\nI2\nsb.&#x27;</span><br></pre></td></tr></table></figure>
+
+<h2 id="load"><a href="#load" class="headerlink" title="load"></a>load</h2><p>load与dump对应，读取某个文件并将其还原为一个类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pickle.load（file，*，fix_imports &#x3D; True，encoding &#x3D;“ASCII”，errors &#x3D;“strict” ）</span><br><span class="line">从打开的文件对象 文件中读取pickle对象表示，并返回其中指定的重构对象层次结构。这相当于Unpickler(file).load()。</span><br></pre></td></tr></table></figure>
+
+<h2 id="loads"><a href="#loads" class="headerlink" title="loads"></a>loads</h2><p>loads与dumps对应，将一个序列化对象换成一个类。 </p>
+<p>在大部分的比赛当中，我们遇见的情况都是题目会load对象，所以我们要找的就是魔法函数。反序列化漏洞出现在 <code>__reduce__()</code>魔法函数上，这一点和PHP中的<code>__wakeup()</code> 魔术方法类似，都是因为每当反序列化过程开始或者结束时 , 都会自动调用这类函数。而这恰好是反序列化漏洞经常出现的地方。</p>
+<p>而且在反序列化过程中，因为编程语言需要根据反序列化字符串去解析出自己独特的语言数据结构，所以就必须要在内部把解析出来的结构去执行一下。如果在反序列化过程中出现问题，便可能直接造成RCE漏洞.</p>
+<p>【上述摘自师傅的博客<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_43431158/article/details/108919605">https://blog.csdn.net/qq_43431158/article/details/108919605</a></p>
+<p>并且loads会自动的解决import问题，对于没有引入的module会自动尝试import，也就是说Python中标准库的代码执行，命令执行函数我们都可以使用，这里记录一下可以尝试使用的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">eval, execfile, compile, open, file, map, input,</span><br><span class="line">os.system, os.popen, os.popen2, os.popen3, os.popen4, os.open, os.pipe,</span><br><span class="line">os.listdir, os.access,</span><br><span class="line">os.execl, os.execle, os.execlp, os.execlpe, os.execv,</span><br><span class="line">os.execve, os.execvp, os.execvpe, os.spawnl, os.spawnle, os.spawnlp, os.spawnlpe,</span><br><span class="line">os.spawnv, os.spawnve, os.spawnvp, os.spawnvpe,</span><br><span class="line">pickle.load, pickle.loads,cPickle.load,cPickle.loads,</span><br><span class="line">subprocess.call,subprocess.check_call,subprocess.check_output,subprocess.Popen,</span><br><span class="line">commands.getstatusoutput,commands.getoutput,commands.getstatus,</span><br><span class="line">glob.glob,</span><br><span class="line">linecache.getline,</span><br><span class="line">shutil.copyfileobj,shutil.copyfile,shutil.copy,shutil.copy2,shutil.move,shutil.make_archive,</span><br><span class="line">dircache.listdir,dircache.opendir,</span><br><span class="line">io.open,</span><br><span class="line">popen2.popen2,popen2.popen3,popen2.popen4,</span><br><span class="line">timeit.timeit,timeit.repeat,</span><br><span class="line">sys.call_tracing,</span><br><span class="line">code.interact,code.compile_command,codeop.compile_command,</span><br><span class="line">pty.spawn,</span><br><span class="line">posixfile.open,posixfile.fileopen,</span><br><span class="line">platform.popen</span><br></pre></td></tr></table></figure>
+
+
+
+<p>当 <code>__reduce__()</code> 函数返回一个元组时 , <strong>第一个元素</strong>是一个可调用对象 , 这个对象会在创建对象时被调用 . <strong>第二个元素</strong>是可调用对象的参数 , 同样是一个元组。</p>
+<p>例子如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__reduce__</span>(<span class="params">self</span>):</span></span><br><span class="line">    print(<span class="string">&quot;wdnmd&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">eval</span>, (<span class="string">&quot;print(123213)&quot;</span>,)</span><br><span class="line">person = Person()</span><br><span class="line"></span><br><span class="line">a = pickle.dumps(person,<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">wdnmd</span></span><br><span class="line"><span class="string">cc</span></span><br><span class="line"><span class="string">b&#x27;c__builtin__\neval\np0\n(Vprint(123213)\np1\ntp2\nRp3\n.&#x27;</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>在反序列化过程结束的时候 , Python 进程会自动调用 <code>__reduce__()</code> 魔术方法 . 如果可以控制被调用函数的参数 , Python 进程就可以执行恶意代码。</p>
+<p><strong>但是在我自己试的时候，发现即使是dumps也会执行我们的语句</strong></p>
+<p>回到loads来说，loads也可以用于执行系统命令，除了ikun那道题目大部分payload使用eval以外，我们还可以使用</p>
+<p>Python2中包含的commands.getoutput(),在Ikun这道题当中：</p>
+<p><img src="image-20201207205603107.png" alt="image-20201207205603107"></p>
+<p>可惜这里只是Python2环境，如果在Python3环境当中，我们可以利用subprocess</p>
+<h4 id="1-call"><a href="#1-call" class="headerlink" title="(1) call"></a>(1) call</h4><p>执行命令，返回状态码(命令正常执行返回0，报错则返回1)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ret1&#x3D;subprocess.call(&quot;ifconfig&quot;)</span><br><span class="line">ret2&#x3D;subprocess.call(&quot;ipconfig&quot;)　　　　#python3.5不是这样，依然会抛出异常导致无法对ret2赋值</span><br><span class="line">print(ret1)     #0</span><br><span class="line">print(ret2)     #1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ret &#x3D; subprocess.call([&quot;ls&quot;, &quot;-l&quot;], shell&#x3D;False)    #shell为False的时候命令必须分开写</span><br><span class="line">ret &#x3D; subprocess.call(&quot;ls -l&quot;, shell&#x3D;True)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-check-call"><a href="#2-check-call" class="headerlink" title="(2) check_call"></a>(2) check_call</h4><p>执行命令，如果执行成功则返回状态码0，否则抛异常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">subprocess.check_call([&quot;ls&quot;, &quot;-l&quot;])</span><br><span class="line">subprocess.check_call(&quot;exit 1&quot;, shell&#x3D;True)</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-check-output"><a href="#3-check-output" class="headerlink" title="(3) check_output"></a>(3) check_output</h4><p>执行命令，如果执行成功则返回执行结果，否则抛异常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">subprocess.check_output([&quot;echo&quot;, &quot;Hello World!&quot;])</span><br><span class="line">subprocess.check_output(&quot;exit 1&quot;, shell&#x3D;True)</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-subprocess-Popen-…"><a href="#4-subprocess-Popen-…" class="headerlink" title="(4) subprocess.Popen(…)"></a>(4) subprocess.Popen(…)</h4>
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Pickle"><span class="toc-number">1.</span> <span class="toc-text">Pickle</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#dump"><span class="toc-number">1.1.</span> <span class="toc-text">dump</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#dumps"><span class="toc-number">1.2.</span> <span class="toc-text">dumps</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#load"><span class="toc-number">1.3.</span> <span class="toc-text">load</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#loads"><span class="toc-number">1.4.</span> <span class="toc-text">loads</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-call"><span class="toc-number">1.4.0.1.</span> <span class="toc-text">(1) call</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-check-call"><span class="toc-number">1.4.0.2.</span> <span class="toc-text">(2) check_call</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-check-output"><span class="toc-number">1.4.0.3.</span> <span class="toc-text">(3) check_output</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-subprocess-Popen-%E2%80%A6"><span class="toc-number">1.4.0.4.</span> <span class="toc-text">(4) subprocess.Popen(…)</span></a></li></ol></li></ol></li></ol></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>

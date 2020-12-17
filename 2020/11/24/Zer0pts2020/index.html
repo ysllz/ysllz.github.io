@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zer0pts2020 - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="Can you guess it?一开始放源码：
+12345678910111213141516171819202122232425262728293031323334353637383940414,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">Zer0pts2020</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">Zer0pts2020</h1>
+        <div class="stuff">
+            <span>十一月 24, 2020</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/BUU/" rel="tag">BUU</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/php/" rel="tag">php</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="Can-you-guess-it"><a href="#Can-you-guess-it" class="headerlink" title="Can you guess it?"></a>Can you guess it?</h1><p>一开始放源码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">include</span> <span class="string">&#x27;config.php&#x27;</span>; <span class="comment">// FLAG is defined in config.php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (preg_match(<span class="string">&#x27;/config\.php\/*$/i&#x27;</span>, $_SERVER[<span class="string">&#x27;PHP_SELF&#x27;</span>])) &#123;</span><br><span class="line">  <span class="keyword">exit</span>(<span class="string">&quot;I don&#x27;t know what you are thinking, but I won&#x27;t let you read it :)&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_GET[<span class="string">&#x27;source&#x27;</span>])) &#123;</span><br><span class="line">  highlight_file(basename($_SERVER[<span class="string">&#x27;PHP_SELF&#x27;</span>]));</span><br><span class="line">  <span class="keyword">exit</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$secret = bin2hex(random_bytes(<span class="number">64</span>));</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_POST[<span class="string">&#x27;guess&#x27;</span>])) &#123;</span><br><span class="line">  $guess = (<span class="keyword">string</span>) $_POST[<span class="string">&#x27;guess&#x27;</span>];</span><br><span class="line">  <span class="keyword">if</span> (hash_equals($secret, $guess)) &#123;</span><br><span class="line">    $message = <span class="string">&#x27;Congratulations! The flag is: &#x27;</span> . FLAG;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    $message = <span class="string">&#x27;Wrong.&#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">&lt;!doctype html&gt;</span><br><span class="line">&lt;html lang=<span class="string">&quot;en&quot;</span>&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">    &lt;meta charset=<span class="string">&quot;utf-8&quot;</span>&gt;</span><br><span class="line">    &lt;title&gt;Can you guess it?&lt;/title&gt;</span><br><span class="line">  &lt;/head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;h1&gt;Can you guess it?&lt;/h1&gt;</span><br><span class="line">    &lt;p&gt;<span class="keyword">If</span> your guess is correct, I<span class="string">&#x27;ll give you the flag.&lt;/p&gt;</span></span><br><span class="line"><span class="string">    &lt;p&gt;&lt;a href=&quot;?source&quot;&gt;Source&lt;/a&gt;&lt;/p&gt;</span></span><br><span class="line"><span class="string">    &lt;hr&gt;</span></span><br><span class="line"><span class="string">&lt;?php if (isset($message)) &#123; ?&gt;</span></span><br><span class="line"><span class="string">    &lt;p&gt;&lt;?= $message ?&gt;&lt;/p&gt;</span></span><br><span class="line"><span class="string">&lt;?php &#125; ?&gt;</span></span><br><span class="line"><span class="string">    &lt;form action=&quot;index.php&quot; method=&quot;POST&quot;&gt;</span></span><br><span class="line"><span class="string">      &lt;input type=&quot;text&quot; name=&quot;guess&quot;&gt;</span></span><br><span class="line"><span class="string">      &lt;input type=&quot;submit&quot;&gt;</span></span><br><span class="line"><span class="string">    &lt;/form&gt;</span></span><br><span class="line"><span class="string">  &lt;/body&gt;</span></span><br><span class="line"><span class="string">&lt;/html&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>虽然这里的猜测成功之后你可以拿到flag，但是很明显这里的函数并没有漏洞，用的函数没有什么问题，那么就转换思路看上面的 highlight_file，因为这里的参数我们也可以控制，介绍一下</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$_SERVER[<span class="string">&#x27;PHP_SELF&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>该参数会返回我们的URL的路径，如图所示：</p>
+<p><img src="image-20201124124501905.png" alt="image-20201124124501905"></p>
+<p>我们再用basename套上去</p>
+<p><img src="image-20201124124659976.png" alt="image-20201124124659976"></p>
+<p>这样就可以拿到最后一部分了，但是basename有一个问题：</p>
+<p><img src="image-20201124124821264.png" alt="image-20201124124821264"></p>
+<p>官网是有提示的，我们需要单独的setloale来进行操作，因为ascii中有这么一段介绍：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在英语中，用128个符号编码便可以表示所有，但是用来表示其他语言，128个符号是不够的。比如，在法语中，字母上方有注音符号，它就无法用 ASCII 码表示。于是，一些欧洲国家就决定，利用字节中闲置的最高位编入新的符号。比如，法语中的é的编码为130（二进制10000010）。这样一来，这些欧洲国家使用的编码体系，可以表示最多256个符号 [5]  。</span><br><span class="line">但是，这里又出现了新的问题。不同的国家有不同的字母，因此，哪怕它们都使用256个符号的编码方式，代表的字母却不一样。比如，130在法语编码中代表了é，在希伯来语编码中却代表了字母Gimel (ג)，在俄语编码中又会代表另一个符号。但是不管怎样，所有这些编码方式中，0--127表示的符号是一样的，不一样的只是128--255的这一段 [5]  。</span><br><span class="line">至于亚洲国家的文字，使用的符号就更多了，汉字就多达10万左右。一个字节只能表示256种符号，肯定是不够的，就必须使用多个字节表达一个符号。比如，简体中文常见的编码方式是 GB2312，使用两个字节表示一个汉字，所以理论上最多可以表示 256 x 256 = 65536 个符号 [5]  。</span><br></pre></td></tr></table></figure>
+
+<p>也就是说，一旦我们的ascii位数大于128，就会出现歧义的情况，而汉字默认使用的是GBK编码，如果我们输出的数大于128，basename因为无法正确的解析，就会忽略这 一段，向前查找。</p>
+<p><img src="image-20201124125211434.png" alt="image-20201124125211434"></p>
+<p>那我们的思路就很清楚了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;3a053ba1-1ae6-4030-8c67-3cacb6336ad7.node3.buuoj.cn&#x2F;index.php&#x2F;config.php&#x2F;%81?source</span><br></pre></td></tr></table></figure>
+
+<p>得到flag</p>
+<p><img src="image-20201124125355533.png" alt="image-20201124125355533"></p>
+<h1 id="phpNantokaAdmin"><a href="#phpNantokaAdmin" class="headerlink" title="phpNantokaAdmin"></a>phpNantokaAdmin</h1><h1 id="MusicBlog"><a href="#MusicBlog" class="headerlink" title="MusicBlog"></a>MusicBlog</h1><p>这里主要是用到了一个trick，关于HTML的一个细节。当HTML出现&lt;a/xxx&gt;的情况下，则会默认只解析前半部分，而不会解析后面的part，具体例子如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">title</span>&gt;</span>基础柱状图<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">a</span> &gt;</span> 123123123123<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">a</span>/<span class="attr">bcde</span>&gt;</span>123<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>但在解析种，依然会将后者解析变成a标签。</p>
+<p>回到题目来说，只需要我们通过该特质+href即可完成跨域绕过</p>
+<p>详细文章：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;guokeya.github.io&#x2F;post&#x2F;rFsNvBC3x&#x2F;</span><br><span class="line"></span><br><span class="line">https:&#x2F;&#x2F;bugs.php.net&#x2F;bug.php?id&#x3D;78814</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="Zer0pts2020/image-20201202150825012.png" alt="image-20201202150825012"></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Can-you-guess-it"><span class="toc-number">1.</span> <span class="toc-text">Can you guess it?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#phpNantokaAdmin"><span class="toc-number">2.</span> <span class="toc-text">phpNantokaAdmin</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MusicBlog"><span class="toc-number">3.</span> <span class="toc-text">MusicBlog</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>

